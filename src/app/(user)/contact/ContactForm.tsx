@@ -57,56 +57,59 @@ export function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)}>
-      <div className="mb-3">
-        <label htmlFor="name" className="form-label">
+      <div className="mb-4">
+        <label htmlFor="name" className="form-label fw-semibold">
           Name <span className="text-danger">*</span>
         </label>
         <input
           type="text"
-          className={`form-control ${errors.name ? "is-invalid" : ""}`}
+          className={`form-control form-control-lg ${errors.name ? "is-invalid" : ""}`}
           id="name"
           {...register("name")}
           placeholder="Your full name"
+          style={{ borderRadius: "12px", border: "2px solid #e9ecef" }}
         />
         {errors.name && (
           <div className="invalid-feedback">{errors.name.message}</div>
         )}
       </div>
 
-      <div className="mb-3">
-        <label htmlFor="email" className="form-label">
+      <div className="mb-4">
+        <label htmlFor="email" className="form-label fw-semibold">
           Email <span className="text-danger">*</span>
         </label>
         <input
           type="email"
-          className={`form-control ${errors.email ? "is-invalid" : ""}`}
+          className={`form-control form-control-lg ${errors.email ? "is-invalid" : ""}`}
           id="email"
           {...register("email")}
           placeholder="your.email@example.com"
+          style={{ borderRadius: "12px", border: "2px solid #e9ecef" }}
         />
         {errors.email && (
           <div className="invalid-feedback">{errors.email.message}</div>
         )}
       </div>
 
-      <div className="mb-3">
-        <label htmlFor="subject" className="form-label">
+      <div className="mb-4">
+        <label htmlFor="subject" className="form-label fw-semibold">
           Subject <span className="text-danger">*</span>
         </label>
         <input
           type="text"
-          className={`form-control ${errors.subject ? "is-invalid" : ""}`}
+          className={`form-control form-control-lg ${errors.subject ? "is-invalid" : ""}`}
           id="subject"
           {...register("subject")}
           placeholder="What is this regarding?"
+          style={{ borderRadius: "12px", border: "2px solid #e9ecef" }}
         />
         {errors.subject && (
           <div className="invalid-feedback">{errors.subject.message}</div>
         )}
       </div>
 
-      <div className="mb-3">
-        <label htmlFor="message" className="form-label">
+      <div className="mb-4">
+        <label htmlFor="message" className="form-label fw-semibold">
           Message <span className="text-danger">*</span>
         </label>
         <textarea
@@ -115,6 +118,7 @@ export function ContactForm() {
           rows={6}
           {...register("message")}
           placeholder="Tell us more about your inquiry..."
+          style={{ borderRadius: "12px", border: "2px solid #e9ecef", resize: "none" }}
         ></textarea>
         {errors.message && (
           <div className="invalid-feedback">{errors.message.message}</div>
@@ -124,8 +128,12 @@ export function ContactForm() {
       <div className="d-grid">
         <button
           type="submit"
-          className="btn btn-primary btn-lg"
+          className="btn btn-primary btn-lg rounded-pill fw-semibold py-3"
           disabled={isSubmitting}
+          style={{
+            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+            border: "none",
+          }}
         >
           {isSubmitting ? (
             <>

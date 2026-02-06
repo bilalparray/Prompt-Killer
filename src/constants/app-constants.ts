@@ -60,9 +60,6 @@ export const AppConstants = {
       ABOUT: "about",
       CONTACT: "contact",
       CATEGORIES: "categories",
-      DASHBOARD: "user/dashboard",
-      PROFILE: "user/profile",
-      SETTINGS: "user/settings",
     },
     // Admin Routes (Auth Required)
     ADMIN: {

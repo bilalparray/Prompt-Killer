@@ -7,160 +7,218 @@ import { UserLayout } from "@/components/layout/UserLayout";
 export default function HomePage() {
   const features = [
     {
-      icon: "bi-shield-check",
-      title: "Enterprise Security",
-      description: "Bank-level encryption and security protocols to keep your data safe and secure.",
-      color: "text-primary",
+      icon: "bi-search",
+      title: "Discover Prompts",
+      description: "Browse through hundreds of carefully curated AI prompts organized by categories.",
+      gradient: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
     },
     {
       icon: "bi-lightning-charge",
-      title: "Lightning Fast",
-      description: "Optimized performance with Next.js 14 for instant page loads and smooth interactions.",
-      color: "text-warning",
+      title: "Instant Access",
+      description: "Copy and use prompts immediately. No sign-up required. Start using powerful AI prompts in seconds.",
+      gradient: "linear-gradient(135deg, #f093fb 0%, #f5576c 100%)",
     },
     {
-      icon: "bi-code-slash",
-      title: "Developer Friendly",
-      description: "Built with TypeScript and modern best practices for easy customization.",
-      color: "text-info",
+      icon: "bi-folder",
+      title: "Organized Categories",
+      description: "Prompts are organized into categories like Text, Image, Code, and more. Find what you need quickly.",
+      gradient: "linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)",
     },
     {
-      icon: "bi-graph-up-arrow",
-      title: "Scalable Architecture",
-      description: "Designed to grow with your business needs, from startup to enterprise.",
-      color: "text-success",
+      icon: "bi-star",
+      title: "Trending Prompts",
+      description: "Discover the most popular and trending prompts that are making waves in the AI community.",
+      gradient: "linear-gradient(135deg, #fa709a 0%, #fee140 100%)",
     },
     {
-      icon: "bi-cloud-check",
-      title: "Cloud Ready",
-      description: "Deploy anywhere with cloud-native architecture and container support.",
-      color: "text-primary",
+      icon: "bi-robot",
+      title: "AI Tool Compatible",
+      description: "Prompts work with popular AI tools like ChatGPT, Midjourney, DALL-E, and many others.",
+      gradient: "linear-gradient(135deg, #30cfd0 0%, #330867 100%)",
     },
     {
-      icon: "bi-headset",
-      title: "24/7 Support",
-      description: "Round-the-clock customer support to help you whenever you need assistance.",
-      color: "text-danger",
+      icon: "bi-heart",
+      title: "Community Driven",
+      description: "Join a growing community of prompt enthusiasts. Like and share your favorite prompts.",
+      gradient: "linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)",
     },
   ];
 
   const stats = [
-    { number: "10K+", label: "Active Users" },
-    { number: "99.9%", label: "Uptime" },
-    { number: "50+", label: "Countries" },
-    { number: "24/7", label: "Support" },
+    { number: "500+", label: "AI Prompts", icon: "bi-lightning-charge" },
+    { number: "50+", label: "Categories", icon: "bi-folder" },
+    { number: "10K+", label: "Users", icon: "bi-people" },
+    { number: "100%", label: "Free", icon: "bi-gift" },
+  ];
+
+  const promptTypes = [
+    {
+      icon: "bi-file-text",
+      title: "Text Prompts",
+      description: "Perfect prompts for text generation, writing assistance, and conversational AI.",
+      examples: ["Creative Writing", "Email Templates", "Content Generation"],
+      color: "#667eea",
+    },
+    {
+      icon: "bi-image",
+      title: "Image Prompts",
+      description: "Stunning prompts for image generation, art creation, and visual content.",
+      examples: ["Digital Art", "Photo Editing", "Concept Art"],
+      color: "#f5576c",
+    },
+    {
+      icon: "bi-code-slash",
+      title: "Code Prompts",
+      description: "Programming prompts for code generation, debugging, and software development.",
+      examples: ["Code Generation", "Bug Fixes", "API Documentation"],
+      color: "#4facfe",
+    },
   ];
 
   const testimonials = [
     {
-      name: "Sarah Johnson",
-      role: "CEO, TechCorp",
-      image: "👩‍💼",
-      text: "Prompt Killer has transformed how we manage our operations. The platform is intuitive and powerful.",
+      name: "Alex Martinez",
+      role: "Content Creator",
+      image: "👨‍🎨",
+      text: "Prompt Killer has revolutionized my content creation workflow. I find amazing prompts in seconds!",
+      rating: 5,
     },
     {
-      name: "Michael Chen",
-      role: "CTO, StartupXYZ",
-      image: "👨‍💻",
-      text: "The best investment we made. The developer experience is exceptional and the documentation is top-notch.",
+      name: "Sarah Kim",
+      role: "Developer",
+      image: "👩‍💻",
+      text: "The code prompts here are incredible. They've saved me hours of work and helped me learn new patterns.",
+      rating: 5,
     },
     {
-      name: "Emily Rodriguez",
-      role: "Product Manager, InnovateCo",
-      image: "👩‍💼",
-      text: "Our team productivity increased by 40% after switching to Prompt Killer. Highly recommended!",
-    },
-  ];
-
-  const pricingPlans = [
-    {
-      name: "Starter",
-      price: "$29",
-      period: "/month",
-      features: [
-        "Up to 5 team members",
-        "10GB storage",
-        "Basic analytics",
-        "Email support",
-        "API access",
-      ],
-      popular: false,
-    },
-    {
-      name: "Professional",
-      price: "$99",
-      period: "/month",
-      features: [
-        "Up to 25 team members",
-        "100GB storage",
-        "Advanced analytics",
-        "Priority support",
-        "Custom integrations",
-        "Advanced security",
-      ],
-      popular: true,
-    },
-    {
-      name: "Enterprise",
-      price: "Custom",
-      period: "",
-      features: [
-        "Unlimited team members",
-        "Unlimited storage",
-        "Custom analytics",
-        "Dedicated support",
-        "White-label options",
-        "SLA guarantee",
-      ],
-      popular: false,
+      name: "David Chen",
+      role: "Digital Artist",
+      image: "🎨",
+      text: "As an artist, I'm always looking for inspiration. The image prompts produce stunning results.",
+      rating: 5,
     },
   ];
 
   return (
     <UserLayout>
       {/* Hero Section */}
-      <section className="bg-primary text-white py-5" style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }}>
-        <div className="container">
-          <div className="row align-items-center min-vh-50">
-            <div className="col-lg-6 mb-4 mb-lg-0">
-              <h1 className="display-3 fw-bold mb-4">
-                Build Amazing Applications with Prompt Killer
+      <section
+        className="position-relative overflow-hidden"
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+          paddingTop: "80px",
+        }}
+      >
+        <div className="container position-relative z-2">
+          <div className="row align-items-center">
+            <div className="col-lg-6 mb-5 mb-lg-0">
+              <div className="mb-4">
+                <span
+                  className="badge px-3 py-2 mb-3"
+                  style={{
+                    background: "rgba(255, 255, 255, 0.2)",
+                    color: "white",
+                    backdropFilter: "blur(10px)",
+                    fontSize: "0.9rem",
+                  }}
+                >
+                  <i className="bi bi-gift me-2"></i>
+                  100% Free • No Sign-up Required
+                </span>
+              </div>
+              <h1
+                className="display-3 fw-bold text-white mb-4"
+                style={{ lineHeight: "1.2" }}
+              >
+                Discover & Use Powerful{" "}
+                <span style={{ color: "#ffd700" }}>AI Prompts</span>
               </h1>
-              <p className="lead mb-4">
-                A production-ready React/Next.js platform with authentication, API architecture,
-                and everything you need to launch fast.
+              <p className="lead text-white mb-4" style={{ opacity: 0.95 }}>
+                Browse hundreds of carefully curated AI prompts for text, image, and code generation.
+                Find the perfect prompt for your next project. Completely free.
               </p>
               <div className="d-flex flex-wrap gap-3">
-                <Link href="/admin/auth/login" className="btn btn-light btn-lg px-4">
-                  <i className="bi bi-box-arrow-in-right me-2"></i>
-                  Get Started
+                <Link
+                  href="/categories"
+                  className="btn btn-light btn-lg px-5 py-3 rounded-pill fw-semibold shadow-lg"
+                  style={{ fontSize: "1.1rem" }}
+                >
+                  <i className="bi bi-folder me-2"></i>
+                  Browse Categories
                 </Link>
-                <Link href="/about" className="btn btn-outline-light btn-lg px-4">
+                <Link
+                  href="/about"
+                  className="btn btn-outline-light btn-lg px-5 py-3 rounded-pill fw-semibold"
+                  style={{ fontSize: "1.1rem" }}
+                >
                   <i className="bi bi-info-circle me-2"></i>
                   Learn More
                 </Link>
               </div>
             </div>
             <div className="col-lg-6 text-center">
-              <div className="p-4">
-                <i className="bi bi-lightning-charge-fill" style={{ fontSize: "12rem", opacity: 0.3 }}></i>
+              <div className="position-relative">
+                <div
+                  className="rounded-4 p-5"
+                  style={{
+                    background: "rgba(255, 255, 255, 0.1)",
+                    backdropFilter: "blur(20px)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                  }}
+                >
+                  <i
+                    className="bi bi-lightning-charge-fill text-white"
+                    style={{ fontSize: "10rem", opacity: 0.8 }}
+                  ></i>
+                </div>
+                <div
+                  className="position-absolute top-0 start-0 w-100 h-100"
+                  style={{
+                    background: "radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%)",
+                    animation: "pulse 3s ease-in-out infinite",
+                  }}
+                ></div>
               </div>
             </div>
           </div>
         </div>
+        <div
+          className="position-absolute bottom-0 start-0 w-100"
+          style={{
+            height: "100px",
+            background: "linear-gradient(to top, rgba(255,255,255,0.1), transparent)",
+          }}
+        ></div>
       </section>
 
       {/* Stats Section */}
-      <section className="py-5 bg-light">
+      <section className="py-5" style={{ background: "#f8f9fa" }}>
         <div className="container">
-          <div className="row g-4 text-center">
+          <div className="row g-4">
             {stats.map((stat, index) => (
               <div key={index} className="col-md-3 col-sm-6">
-                <div className="card border-0 shadow-sm h-100">
-                  <div className="card-body">
-                    <h2 className="display-4 fw-bold text-primary mb-2">{stat.number}</h2>
-                    <p className="text-muted mb-0">{stat.label}</p>
+                <div
+                  className="card border-0 shadow-sm h-100 text-center p-4 hover-lift"
+                  style={{ borderRadius: "16px" }}
+                >
+                  <div
+                    className="mb-3 mx-auto rounded-circle d-flex align-items-center justify-content-center"
+                    style={{
+                      width: "60px",
+                      height: "60px",
+                      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                      color: "white",
+                    }}
+                  >
+                    <i className={`bi ${stat.icon} fs-4`}></i>
                   </div>
+                  <h2 className="display-5 fw-bold mb-2" style={{ color: "#667eea" }}>
+                    {stat.number}
+                  </h2>
+                  <p className="text-muted mb-0 fw-semibold">{stat.label}</p>
                 </div>
               </div>
             ))}
@@ -173,21 +231,33 @@ export default function HomePage() {
         <div className="container">
           <div className="row mb-5">
             <div className="col-12 text-center">
-              <h2 className="display-5 fw-bold mb-3">Why Choose Prompt Killer?</h2>
+              <h2 className="display-4 fw-bold mb-3">Why Choose Prompt Killer?</h2>
               <p className="lead text-muted">
-                Everything you need to build and scale your application
+                Your one-stop destination for discovering and using powerful AI prompts
               </p>
             </div>
           </div>
           <div className="row g-4">
             {features.map((feature, index) => (
               <div key={index} className="col-lg-4 col-md-6">
-                <div className="card border-0 shadow-sm h-100 hover-lift">
+                <div
+                  className="card border-0 shadow-sm h-100 hover-lift"
+                  style={{ borderRadius: "20px", overflow: "hidden" }}
+                >
+                  <div
+                    className="p-4 text-white"
+                    style={{
+                      background: feature.gradient,
+                      minHeight: "120px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
+                    <i className={`bi ${feature.icon}`} style={{ fontSize: "3.5rem" }}></i>
+                  </div>
                   <div className="card-body p-4">
-                    <div className="mb-3">
-                      <i className={`bi ${feature.icon} ${feature.color}`} style={{ fontSize: "3rem" }}></i>
-                    </div>
-                    <h4 className="fw-semibold mb-3">{feature.title}</h4>
+                    <h4 className="fw-bold mb-3">{feature.title}</h4>
                     <p className="text-muted mb-0">{feature.description}</p>
                   </div>
                 </div>
@@ -197,86 +267,51 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* How It Works Section */}
-      <section className="py-5 bg-light">
+      {/* Prompt Types Section */}
+      <section className="py-5" style={{ background: "#f8f9fa" }}>
         <div className="container">
           <div className="row mb-5">
             <div className="col-12 text-center">
-              <h2 className="display-5 fw-bold mb-3">How It Works</h2>
-              <p className="lead text-muted">Get started in minutes, not days</p>
+              <h2 className="display-4 fw-bold mb-3">Explore Prompt Types</h2>
+              <p className="lead text-muted">Find prompts for every type of AI task</p>
             </div>
           </div>
           <div className="row g-4">
-            <div className="col-md-4 text-center">
-              <div className="mb-4">
-                <div className="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" style={{ width: "80px", height: "80px" }}>
-                  <span className="fs-1 fw-bold">1</span>
-                </div>
-              </div>
-              <h4 className="fw-semibold mb-3">Sign Up</h4>
-              <p className="text-muted">
-                Create your account in seconds. No credit card required to get started.
-              </p>
-            </div>
-            <div className="col-md-4 text-center">
-              <div className="mb-4">
-                <div className="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" style={{ width: "80px", height: "80px" }}>
-                  <span className="fs-1 fw-bold">2</span>
-                </div>
-              </div>
-              <h4 className="fw-semibold mb-3">Customize</h4>
-              <p className="text-muted">
-                Configure your settings, integrate your tools, and customize to your needs.
-              </p>
-            </div>
-            <div className="col-md-4 text-center">
-              <div className="mb-4">
-                <div className="rounded-circle bg-primary text-white d-inline-flex align-items-center justify-content-center" style={{ width: "80px", height: "80px" }}>
-                  <span className="fs-1 fw-bold">3</span>
-                </div>
-              </div>
-              <h4 className="fw-semibold mb-3">Launch</h4>
-              <p className="text-muted">
-                Deploy your application and start growing your business with confidence.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials Section */}
-      <section className="py-5">
-        <div className="container">
-          <div className="row mb-5">
-            <div className="col-12 text-center">
-              <h2 className="display-5 fw-bold mb-3">What Our Customers Say</h2>
-              <p className="lead text-muted">Trusted by thousands of businesses worldwide</p>
-            </div>
-          </div>
-          <div className="row g-4">
-            {testimonials.map((testimonial, index) => (
-              <div key={index} className="col-md-4">
-                <div className="card border-0 shadow-sm h-100">
+            {promptTypes.map((type, index) => (
+              <div key={index} className="col-lg-4 col-md-6">
+                <div
+                  className="card border-0 shadow-sm h-100 hover-lift"
+                  style={{ borderRadius: "20px" }}
+                >
                   <div className="card-body p-4">
-                    <div className="mb-3">
-                      <div className="d-flex align-items-center mb-3">
-                        <div className="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center me-3" style={{ width: "60px", height: "60px", fontSize: "2rem" }}>
-                          {testimonial.image}
-                        </div>
-                        <div>
-                          <h6 className="fw-semibold mb-0">{testimonial.name}</h6>
-                          <small className="text-muted">{testimonial.role}</small>
-                        </div>
-                      </div>
-                      <div className="text-warning mb-2">
-                        <i className="bi bi-star-fill"></i>
-                        <i className="bi bi-star-fill"></i>
-                        <i className="bi bi-star-fill"></i>
-                        <i className="bi bi-star-fill"></i>
-                        <i className="bi bi-star-fill"></i>
-                      </div>
+                    <div
+                      className="mb-3 rounded-circle d-inline-flex align-items-center justify-content-center"
+                      style={{
+                        width: "70px",
+                        height: "70px",
+                        background: `${type.color}15`,
+                        color: type.color,
+                      }}
+                    >
+                      <i className={`bi ${type.icon}`} style={{ fontSize: "2.5rem" }}></i>
                     </div>
-                    <p className="text-muted mb-0">"{testimonial.text}"</p>
+                    <h4 className="fw-bold mb-3">{type.title}</h4>
+                    <p className="text-muted mb-3">{type.description}</p>
+                    <div className="d-flex flex-wrap gap-2">
+                      {type.examples.map((example, exampleIndex) => (
+                        <span
+                          key={exampleIndex}
+                          className="badge px-3 py-2"
+                          style={{
+                            background: `${type.color}15`,
+                            color: type.color,
+                            fontSize: "0.85rem",
+                          }}
+                        >
+                          {example}
+                        </span>
+                      ))}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -285,44 +320,125 @@ export default function HomePage() {
         </div>
       </section>
 
-      {/* Pricing Section */}
-      <section className="py-5 bg-light">
+      {/* How It Works Section */}
+      <section className="py-5">
         <div className="container">
           <div className="row mb-5">
             <div className="col-12 text-center">
-              <h2 className="display-5 fw-bold mb-3">Simple, Transparent Pricing</h2>
-              <p className="lead text-muted">Choose the plan that's right for you</p>
+              <h2 className="display-4 fw-bold mb-3">How It Works</h2>
+              <p className="lead text-muted">Start using AI prompts in three simple steps</p>
             </div>
           </div>
-          <div className="row g-4 justify-content-center">
-            {pricingPlans.map((plan, index) => (
-              <div key={index} className="col-lg-4 col-md-6">
-                <div className={`card border-0 shadow-sm h-100 ${plan.popular ? "border-primary border-2" : ""}`}>
-                  {plan.popular && (
-                    <div className="bg-primary text-white text-center py-2">
-                      <small className="fw-semibold">MOST POPULAR</small>
-                    </div>
-                  )}
+          <div className="row g-4">
+            {[
+              {
+                step: "1",
+                icon: "bi-folder",
+                title: "Browse Categories",
+                description: "Explore our organized collection of prompt categories. Find prompts for text, image, code, and more.",
+              },
+              {
+                step: "2",
+                icon: "bi-search",
+                title: "Find Your Prompt",
+                description: "Search through hundreds of prompts. Filter by category, type, or popularity to find exactly what you need.",
+              },
+              {
+                step: "3",
+                icon: "bi-clipboard-check",
+                title: "Copy & Use",
+                description: "Copy the prompt and use it with your favorite AI tool. No sign-up required. It's that simple!",
+              },
+            ].map((item, index) => (
+              <div key={index} className="col-md-4 text-center">
+                <div className="mb-4 position-relative">
+                  <div
+                    className="rounded-circle mx-auto d-flex align-items-center justify-content-center position-relative"
+                    style={{
+                      width: "100px",
+                      height: "100px",
+                      background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                      color: "white",
+                      fontSize: "2.5rem",
+                      fontWeight: "bold",
+                      zIndex: 2,
+                    }}
+                  >
+                    {item.step}
+                  </div>
+                  <div
+                    className="position-absolute top-50 start-50 translate-middle rounded-circle"
+                    style={{
+                      width: "120px",
+                      height: "120px",
+                      background: "rgba(102, 126, 234, 0.1)",
+                      zIndex: 1,
+                    }}
+                  ></div>
+                </div>
+                <div
+                  className="mb-3 mx-auto rounded-circle d-flex align-items-center justify-content-center"
+                  style={{
+                    width: "60px",
+                    height: "60px",
+                    background: "#f8f9fa",
+                    color: "#667eea",
+                  }}
+                >
+                  <i className={`bi ${item.icon} fs-4`}></i>
+                </div>
+                <h4 className="fw-bold mb-3">{item.title}</h4>
+                <p className="text-muted">{item.description}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials Section */}
+      <section className="py-5" style={{ background: "#f8f9fa" }}>
+        <div className="container">
+          <div className="row mb-5">
+            <div className="col-12 text-center">
+              <h2 className="display-4 fw-bold mb-3">What Our Users Say</h2>
+              <p className="lead text-muted">Trusted by thousands of creators and developers</p>
+            </div>
+          </div>
+          <div className="row g-4">
+            {testimonials.map((testimonial, index) => (
+              <div key={index} className="col-md-4">
+                <div
+                  className="card border-0 shadow-sm h-100 hover-lift"
+                  style={{ borderRadius: "20px" }}
+                >
                   <div className="card-body p-4">
-                    <h4 className="fw-bold mb-3">{plan.name}</h4>
-                    <div className="mb-4">
-                      <span className="display-4 fw-bold">{plan.price}</span>
-                      {plan.period && <span className="text-muted">{plan.period}</span>}
+                    <div className="mb-3">
+                      <div className="text-warning mb-2">
+                        {Array.from({ length: testimonial.rating }).map((_, i) => (
+                          <i key={i} className="bi bi-star-fill"></i>
+                        ))}
+                      </div>
+                      <p className="text-muted mb-0" style={{ fontStyle: "italic" }}>
+                        "{testimonial.text}"
+                      </p>
                     </div>
-                    <ul className="list-unstyled mb-4">
-                      {plan.features.map((feature, featureIndex) => (
-                        <li key={featureIndex} className="mb-2">
-                          <i className="bi bi-check-circle-fill text-success me-2"></i>
-                          {feature}
-                        </li>
-                      ))}
-                    </ul>
-                    <Link
-                      href="/admin/auth/login"
-                      className={`btn w-100 ${plan.popular ? "btn-primary" : "btn-outline-primary"}`}
-                    >
-                      Get Started
-                    </Link>
+                    <div className="d-flex align-items-center mt-4 pt-3 border-top">
+                      <div
+                        className="rounded-circle d-flex align-items-center justify-content-center me-3"
+                        style={{
+                          width: "50px",
+                          height: "50px",
+                          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                          fontSize: "1.5rem",
+                        }}
+                      >
+                        {testimonial.image}
+                      </div>
+                      <div>
+                        <h6 className="fw-bold mb-0">{testimonial.name}</h6>
+                        <small className="text-muted">{testimonial.role}</small>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -332,32 +448,69 @@ export default function HomePage() {
       </section>
 
       {/* CTA Section */}
-      <section className="py-5" style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)" }}>
-        <div className="container">
+      <section
+        className="py-5 position-relative overflow-hidden"
+        style={{
+          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+        }}
+      >
+        <div className="container position-relative z-2">
           <div className="row">
             <div className="col-lg-8 mx-auto text-center text-white">
-              <h2 className="display-5 fw-bold mb-4">Ready to Get Started?</h2>
-              <p className="lead mb-4">
-                Join thousands of businesses already using Prompt Killer to power their applications.
+              <h2 className="display-4 fw-bold mb-4">Ready to Discover Amazing Prompts?</h2>
+              <p className="lead mb-4" style={{ opacity: 0.95 }}>
+                Start browsing our collection of AI prompts today. No sign-up required. Completely free.
               </p>
               <div className="d-flex flex-wrap gap-3 justify-content-center">
-                <Link href="/admin/auth/login" className="btn btn-light btn-lg px-5">
-                  <i className="bi bi-rocket-takeoff me-2"></i>
-                  Start Free Trial
+                <Link
+                  href="/categories"
+                  className="btn btn-light btn-lg px-5 py-3 rounded-pill fw-semibold shadow-lg"
+                  style={{ fontSize: "1.1rem" }}
+                >
+                  <i className="bi bi-folder me-2"></i>
+                  Browse Categories
                 </Link>
-                <Link href="/contact" className="btn btn-outline-light btn-lg px-5">
+                <Link
+                  href="/contact"
+                  className="btn btn-outline-light btn-lg px-5 py-3 rounded-pill fw-semibold"
+                  style={{ fontSize: "1.1rem" }}
+                >
                   <i className="bi bi-envelope me-2"></i>
-                  Contact Sales
+                  Contact Us
                 </Link>
               </div>
               <p className="mt-4 mb-0">
-                <small>No credit card required • 14-day free trial • Cancel anytime</small>
+                <small style={{ opacity: 0.9 }}>
+                  <i className="bi bi-gift me-1"></i>
+                  100% Free • No Sign-up Required • Instant Access
+                </small>
               </p>
             </div>
           </div>
         </div>
       </section>
 
+      <style jsx global>{`
+        @keyframes pulse {
+          0%, 100% {
+            opacity: 0.5;
+            transform: scale(1);
+          }
+          50% {
+            opacity: 0.8;
+            transform: scale(1.05);
+          }
+        }
+
+        .hover-lift {
+          transition: all 0.3s ease;
+        }
+
+        .hover-lift:hover {
+          transform: translateY(-8px);
+          box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+        }
+      `}</style>
     </UserLayout>
   );
 }
