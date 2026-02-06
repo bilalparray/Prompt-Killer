@@ -1,4 +1,4 @@
-# React Boilerplate - Project Summary
+# Prompt Killer - Project Summary
 
 ## ✅ What You Got
 
@@ -73,7 +73,6 @@
 
 1. **Install dependencies:**
    ```bash
-   cd React
    npm install
    ```
 
@@ -94,7 +93,7 @@
 ## 📁 Project Structure
 
 ```
-React/
+Prompt Killer/
 ├── src/
 │   ├── app/                    # Next.js App Router pages
 │   │   ├── (auth)/            # Auth route group
@@ -915,7 +914,7 @@ export default function HomePage() {
     <Layout>
       {/* Static content rendered on server */}
       <div className="container mt-5">
-        <h1>Welcome to Boilerplate</h1>
+        <h1>Welcome to Prompt Killer</h1>
         {/* Static features list */}
         <ClientCTAButtons /> {/* Interactive buttons as client component */}
       </div>

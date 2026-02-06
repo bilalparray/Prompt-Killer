@@ -27,7 +27,7 @@ export const environment = {
     LogLocation: "Console,Api",
     ExceptionLocation: "Console,Api",
     cacheLogs: true,
-    localLogFilePath: "react-boilerplate.log",
+    localLogFilePath: "prompt-killer.log",
   },
   encryptionKey: "12345678",
 };
