@@ -1,0 +1,106 @@
+import { environment } from "@/environments/environment";
+
+export const AppConstants = {
+  API_ENDPOINTS: {
+    TEST_URL: "test/test",
+    LOG_URL: "log",
+    DUMMY_TEACHER_URL: "api/v1/DummyTeacher",
+    DUMMY_STUDENT_URL: "api/token",
+    CLIENT_USER: "/api/v1/ClientUser",
+    RENO_ADS: "api/v1/RenoAds",
+    CompanyAdditionalInfo: "api/v1/CompanyAdditionalInfo",
+    EXTERNAL_USER: "/api/v1/ExternalUser",
+    FEEDBACK: "api/v1/Feedback",
+    ApplicationFile: "api/v1/ApplicationFile",
+    ClientCompanyAdditionalInfo: "api/v1/ClientCompanyAdditionalInfo",
+  },
+  DATABASE_KEYS: {
+    ACCESS_TOKEN: "ACCESS_TOKEN",
+    LOGIN_USER: "LOGIN_USER",
+    API_RESP_CACHE: "API_RESP_CACHE",
+    PLATFORM: "PLATFORM",
+    REMEMBER_PWD: "REMEMBER_PWD",
+    COMPANY_CODE: "COMPANY_CODE",
+    AUTOMATION_TOKEN: "AUTOMATION_TOKEN",
+    AUTOMATION_USER: "AUTOMATION_USER",
+    APP_LOGS: "APP_LOGS",
+    EXCEPTION_LOGS: "EXCEPTION_LOGS",
+    USER: "USER",
+    FEEDBACK_INFO: "FEEDBACK_INFO",
+    SAVED_LOGIN_ID: "SAVED_LOGIN_ID",
+    SAVED_PASSWORD: "SAVED_PASSWORD",
+  },
+  DATABASE_DEFAULT_VALUES: {},
+  ERROR_PROMPTS: {
+    App_StartError: "Error occurred. Please restart the application.",
+    Load_Data_Error: "Error in loading data. Please try again.",
+    Invalid_Input_Data: "Invalid data. Please try again.",
+    Unknown_Error: "Error occurred. Please try again.",
+    Network_Error: "Please check network and try again.",
+    Save_Data_Error: "Error in saving. Please try again.",
+    Delete_Data_Error: "Error in delete. Please try again.",
+    Permission_Error: "Permission denied.",
+    Unauthorized_User: "User not authorized. Please relogin.",
+  },
+  HEADER_NAMES: {
+    ApiType: "targetapitype",
+    DevApk: "isdeveloperapk",
+    AppVersion: "appversion",
+  },
+  HEADER_VALUES: {
+    ApiType: "abcd",
+    DevApk: (!environment.production).toString(),
+    AppVersion: environment.applicationVersion,
+  },
+  WEB_ROUTES: {
+    // Public User Routes (No Auth Required)
+    USER: {
+      HOME: "home",
+      ABOUT: "about",
+      CONTACT: "contact",
+      DASHBOARD: "user/dashboard",
+      PROFILE: "user/profile",
+      SETTINGS: "user/settings",
+    },
+    // Admin Routes (Auth Required)
+    ADMIN: {
+      LOGIN: "admin/auth/login",
+      REGISTER: "admin/auth/register",
+      FORGOT_PASSWORD: "admin/auth/forgotpassword",
+      RESET_PASSWORD: "admin/auth/resetpassword",
+      VERIFY_EMAIL: "admin/auth/verifyemail",
+      DASHBOARD: "admin/dashboard",
+      PROFILE: "admin/profile",
+      SETTINGS: "admin/settings",
+      USERS: "admin/users",
+    },
+    // Legacy routes (for backward compatibility)
+    ENDUSER: {
+      SAMPLE: "sample",
+      DummyTeacher: "dummyTeacher",
+      UNAUTHORIZED: "",
+      LOGIN: "admin/auth/login",
+      HOME: "",
+    },
+    SUPERADMIN: {
+      LOGIN: "superadmin/login",
+      DASHBOARD: "superadmin/dashboard",
+    },
+    NOTFOUND: "**",
+  },
+  TOKEN_KEY_NAMES: {
+    Role: "http://schemas.microsoft.com/ws/2008/06/identity/claims/role",
+    Expiry: "exp",
+    CompanyCode: "clCd",
+    Audience: "aud",
+    CompanyId: "clId",
+    RecordId: "dbRId",
+    EmailAddress:
+      "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress",
+    UserName: "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name",
+    GivenName:
+      "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname",
+    Issuer: "iss",
+    TokenStart: "nbf",
+  },
+};

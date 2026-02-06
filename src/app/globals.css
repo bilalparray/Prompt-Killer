@@ -1,0 +1,149 @@
+:root {
+  --bs-primary: #0d6efd;
+  --bs-secondary: #6c757d;
+  --gradient-primary: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  --gradient-secondary: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+}
+
+[data-theme="dark"] {
+  --bs-body-bg: #212529;
+  --bs-body-color: #fff;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Navbar enhancements */
+.navbar {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.navbar-brand {
+  font-weight: 700;
+  letter-spacing: -0.5px;
+}
+
+/* Footer enhancements */
+footer {
+  background: linear-gradient(180deg, #1a1a2e 0%, #16213e 100%) !important;
+  color: #ffffff !important;
+}
+
+footer h5,
+footer .fw-semibold,
+footer .text-white {
+  color: #ffffff !important;
+}
+
+footer p,
+footer .text-muted,
+footer small {
+  color: #b0b0b0 !important;
+}
+
+footer a {
+  color: #b0b0b0 !important;
+}
+
+footer a:hover {
+  color: #ffffff !important;
+}
+
+/* Smooth transitions */
+* {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Spinner overlay */
+.spinner-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+  backdrop-filter: blur(4px);
+}
+
+.spinner-container {
+  text-align: center;
+  color: white;
+}
+
+/* Form validation */
+.invalid-input {
+  border-color: #dc3545;
+}
+
+.valid-input {
+  border-color: #198754;
+}
+
+/* Custom button hover effects */
+.btn {
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+/* Card hover effects */
+.card {
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+/* Link hover effects */
+a {
+  transition: all 0.3s ease;
+}
+
+/* Dropdown menu animations */
+.dropdown-menu {
+  animation: fadeInDown 0.3s ease;
+}
+
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Home page specific styles */
+.hover-lift {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15) !important;
+}
+
+.min-vh-50 {
+  min-height: 50vh;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .navbar-brand {
+    font-size: 1.1rem;
+  }
+}
