@@ -13,6 +13,7 @@ export const AppConstants = {
     FEEDBACK: "api/v1/Feedback",
     ApplicationFile: "api/v1/ApplicationFile",
     ClientCompanyAdditionalInfo: "api/v1/ClientCompanyAdditionalInfo",
+    CATEGORY: "api/v1/Category",
   },
   DATABASE_KEYS: {
     ACCESS_TOKEN: "ACCESS_TOKEN",
@@ -58,6 +59,7 @@ export const AppConstants = {
       HOME: "home",
       ABOUT: "about",
       CONTACT: "contact",
+      CATEGORIES: "categories",
       DASHBOARD: "user/dashboard",
       PROFILE: "user/profile",
       SETTINGS: "user/settings",
@@ -73,6 +75,7 @@ export const AppConstants = {
       PROFILE: "admin/profile",
       SETTINGS: "admin/settings",
       USERS: "admin/users",
+      CATEGORIES: "admin/categories",
     },
     // Legacy routes (for backward compatibility)
     ENDUSER: {

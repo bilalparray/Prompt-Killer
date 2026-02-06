@@ -92,6 +92,17 @@ export function AdminTopNav() {
                     <li className="nav-item">
                       <Link
                         className={`nav-link d-flex align-items-center ${
+                          pathname?.startsWith("/admin/categories") ? "active" : ""
+                        }`}
+                        href="/admin/categories"
+                      >
+                        <i className="bi bi-folder me-1"></i>
+                        <span>Categories</span>
+                      </Link>
+                    </li>
+                    <li className="nav-item">
+                      <Link
+                        className={`nav-link d-flex align-items-center ${
                           pathname?.startsWith("/admin/users") ? "active" : ""
                         }`}
                         href="/admin/users"

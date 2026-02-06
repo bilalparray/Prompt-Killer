@@ -99,22 +99,40 @@ export default function AdminDashboardPage() {
           </div>
           <div className="row g-4 mt-4">
             {(hasRole(RoleTypeSM.ClientAdmin) || hasRole(RoleTypeSM.SuperAdmin) || hasRole(RoleTypeSM.SystemAdmin)) && (
-              <div className="col-md-4">
-                <div className="card shadow-sm h-100 hover-lift">
-                  <div className="card-body">
-                    <div className="d-flex align-items-center mb-3">
-                      <i className="bi bi-people text-primary fs-1 me-3"></i>
-                      <div>
-                        <h5 className="card-title mb-0">User Management</h5>
-                        <p className="text-muted small mb-0">Manage users and permissions</p>
+              <>
+                <div className="col-md-4">
+                  <div className="card shadow-sm h-100 hover-lift">
+                    <div className="card-body">
+                      <div className="d-flex align-items-center mb-3">
+                        <i className="bi bi-folder text-primary fs-1 me-3"></i>
+                        <div>
+                          <h5 className="card-title mb-0">Categories</h5>
+                          <p className="text-muted small mb-0">Manage prompt categories</p>
+                        </div>
                       </div>
+                      <Link href="/admin/categories" className="btn btn-outline-primary btn-sm">
+                        Manage Categories
+                      </Link>
                     </div>
-                    <Link href="/admin/users" className="btn btn-outline-primary btn-sm">
-                      Manage Users
-                    </Link>
                   </div>
                 </div>
-              </div>
+                <div className="col-md-4">
+                  <div className="card shadow-sm h-100 hover-lift">
+                    <div className="card-body">
+                      <div className="d-flex align-items-center mb-3">
+                        <i className="bi bi-people text-primary fs-1 me-3"></i>
+                        <div>
+                          <h5 className="card-title mb-0">User Management</h5>
+                          <p className="text-muted small mb-0">Manage users and permissions</p>
+                        </div>
+                      </div>
+                      <Link href="/admin/users" className="btn btn-outline-primary btn-sm">
+                        Manage Users
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </>
             )}
           </div>
         </div>

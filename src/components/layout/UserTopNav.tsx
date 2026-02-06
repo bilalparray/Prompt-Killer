@@ -84,6 +84,15 @@ export function UserTopNav() {
                 <span>Contact</span>
               </Link>
             </li>
+            <li className="nav-item">
+              <Link
+                className={`nav-link d-flex align-items-center ${pathname === "/categories" ? "active" : ""}`}
+                href="/categories"
+              >
+                <i className="bi bi-folder me-1"></i>
+                <span>Categories</span>
+              </Link>
+            </li>
             {isAuthenticated && (
               <li className="nav-item">
                 <Link
