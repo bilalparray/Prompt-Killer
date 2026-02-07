@@ -19,21 +19,14 @@ export default function AdminCategoriesPage() {
   const { commonService } = useCommon();
   const [categories, setCategories] = useState<CategorySM[]>([]);
   const [loading, setLoading] = useState(true);
-  const [showModal, setShowModal] = useState(false);
-  const [editingCategory, setEditingCategory] = useState<CategorySM | null>(null);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage] = useState(10);
+  const [itemsPerPage] = useState(12);
   const [totalCount, setTotalCount] = useState(0);
 
   useEffect(() => {
     loadCategories();
   }, [currentPage]);
-
-  useEffect(() => {
-    // Reset to page 1 when search term changes
-    setCurrentPage(1);
-  }, [searchTerm]);
 
   const loadCategories = async () => {
     try {
@@ -49,7 +42,6 @@ export default function AdminCategoriesPage() {
       const skip = (currentPage - 1) * itemsPerPage;
       const top = itemsPerPage;
 
-      // Load categories and count in parallel
       const [categoriesResponse, countResponse] = await Promise.all([
         categoryService.getCategoriesForAdmin(skip, top),
         categoryService.getCategoriesCountForAdmin(),
@@ -74,10 +66,10 @@ export default function AdminCategoriesPage() {
     }
   };
 
-  const handleDelete = async (id: number) => {
+  const handleDelete = async (id: number, name: string) => {
     const result = await commonService.showSweetAlertConfirmation({
       title: "Are you sure?",
-      text: "You won't be able to revert this!",
+      text: `You are about to delete "${name}". This action cannot be undone!`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
@@ -97,17 +89,14 @@ export default function AdminCategoriesPage() {
 
         await categoryService.deleteCategory(id);
 
-        // Check if we need to adjust page after deletion
         const countResponse = await categoryService.getCategoriesCountForAdmin();
         if (countResponse.successData) {
           const newTotalCount = countResponse.successData.value;
           const newTotalPages = Math.ceil(newTotalCount / itemsPerPage);
 
-          // If current page is beyond available pages, go to last page
           if (currentPage > newTotalPages && newTotalPages > 0) {
             setCurrentPage(newTotalPages);
           } else {
-            // Reload current page
             await loadCategories();
           }
         } else {
@@ -118,7 +107,7 @@ export default function AdminCategoriesPage() {
         await commonService.showSweetAlertToast({
           icon: "success",
           title: "Deleted!",
-          text: "Category has been deleted.",
+          text: "Category has been deleted successfully.",
         });
       } catch (error: any) {
         await commonService.dismissLoader();
@@ -131,7 +120,7 @@ export default function AdminCategoriesPage() {
     }
   };
 
-  const handleToggleStatus = async (id: number, currentStatus: boolean) => {
+  const handleToggleStatus = async (id: number, currentStatus: boolean, name: string) => {
     try {
       await commonService.presentLoading("Updating status...");
 
@@ -146,7 +135,7 @@ export default function AdminCategoriesPage() {
       await commonService.showSweetAlertToast({
         icon: "success",
         title: "Updated!",
-        text: "Category status has been updated.",
+        text: `Category "${name}" has been ${!currentStatus ? "activated" : "deactivated"}.`,
       });
       loadCategories();
     } catch (error: any) {
@@ -159,62 +148,80 @@ export default function AdminCategoriesPage() {
     }
   };
 
-  // Filter categories based on search term (client-side filtering for current page)
   const filteredCategories = categories.filter(
     (cat) =>
       cat.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cat.description?.toLowerCase().includes(searchTerm.toLowerCase())
+      cat.description?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      cat.slug?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // Calculate pagination
   const totalPages = Math.ceil(totalCount / itemsPerPage);
-  const startItem = (currentPage - 1) * itemsPerPage + 1;
+  const startItem = totalCount > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
   const endItem = Math.min(currentPage * itemsPerPage, totalCount);
 
   const handlePageChange = (page: number) => {
     if (page >= 1 && page <= totalPages) {
       setCurrentPage(page);
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   return (
     <AuthGuard allowedRoles={[RoleTypeSM.ClientAdmin, RoleTypeSM.SuperAdmin, RoleTypeSM.SystemAdmin]}>
       <AdminLayout>
-        <div className="container mt-5 mb-5">
+        <div className="container mt-4 mb-5">
+          {/* Header Section */}
           <div className="row mb-4">
-            <div className="col-12 d-flex justify-content-between align-items-center">
-              <div>
-                <h1 className="display-5">Category Management</h1>
-                <p className="lead">Manage prompt categories</p>
+            <div className="col-12">
+              <div className="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                  <h1 className="display-5 fw-bold mb-2">Category Management</h1>
+                  <p className="text-muted mb-0">Manage and organize your prompt categories</p>
+                </div>
+                <Link
+                  href="/admin/dashboard"
+                  className="btn btn-outline-secondary rounded-pill px-4"
+                >
+                  <i className="bi bi-arrow-left me-2"></i>
+                  Back to Dashboard
+                </Link>
               </div>
-              <Link href="/admin/dashboard" className="btn btn-outline-secondary">
-                <i className="bi bi-arrow-left me-1"></i>
-                Back to Dashboard
-              </Link>
             </div>
           </div>
 
+          {/* Search and Actions Bar */}
           <div className="row mb-4">
             <div className="col-12">
-              <div className="card shadow-sm">
-                <div className="card-body">
-                  <div className="row align-items-center">
-                    <div className="col-md-6">
-                      <div className="input-group">
-                        <span className="input-group-text">
-                          <i className="bi bi-search"></i>
+              <div
+                className="card border-0 shadow-sm"
+                style={{ borderRadius: "16px" }}
+              >
+                <div className="card-body p-4">
+                  <div className="row align-items-center g-3">
+                    <div className="col-md-8">
+                      <div className="input-group input-group-lg">
+                        <span className="input-group-text bg-white border-end-0">
+                          <i className="bi bi-search text-muted"></i>
                         </span>
                         <input
                           type="text"
-                          className="form-control"
-                          placeholder="Search categories by name or description..."
+                          className="form-control border-start-0"
+                          placeholder="Search categories by name, slug, or description..."
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
+                          style={{ borderRadius: "12px" }}
                         />
                       </div>
                     </div>
-                    <div className="col-md-6 text-end">
-                      <Link href="/admin/categories/create" className="btn btn-primary">
+                    <div className="col-md-4 text-end">
+                      <Link
+                        href="/admin/categories/create"
+                        className="btn btn-primary btn-lg rounded-pill px-4"
+                        style={{
+                          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                          border: "none",
+                        }}
+                      >
                         <i className="bi bi-plus-circle me-2"></i>
                         Add New Category
                       </Link>
@@ -225,178 +232,281 @@ export default function AdminCategoriesPage() {
             </div>
           </div>
 
+          {/* Categories Grid */}
           {loading ? (
             <div className="text-center py-5">
-              <div className="spinner-border text-primary" role="status">
+              <div className="spinner-border text-primary" role="status" style={{ width: "3rem", height: "3rem" }}>
                 <span className="visually-hidden">Loading...</span>
               </div>
+              <p className="mt-3 text-muted">Loading categories...</p>
             </div>
-          ) : (
-            <div className="row">
-              <div className="col-12">
-                <div className="card shadow-sm">
-                  <div className="card-body">
-                    <div className="table-responsive">
-                      <table className="table table-hover">
-                        <thead>
-                          <tr>
-                            <th>Name</th>
-                            <th>Slug</th>
-                            <th>Description</th>
-                            <th>Status</th>
-                            <th>Prompts</th>
-                            <th>Actions</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {filteredCategories.length > 0 ? (
-                            filteredCategories.map((category) => (
-                              <tr key={category.id}>
-                                <td>
-                                  <div className="d-flex align-items-center">
-                                    {category.imageBase64 && (
-                                      <img
-                                        src={`data:image/png;base64,${category.imageBase64}`}
-                                        alt={category.name}
-                                        className="rounded me-2"
-                                        style={{ width: "40px", height: "40px", objectFit: "cover" }}
-                                      />
-                                    )}
-                                    <strong>{category.name}</strong>
-                                  </div>
-                                </td>
-                                <td>
-                                  <code className="text-muted">{category.slug || "N/A"}</code>
-                                </td>
-                                <td>
-                                  <span className="text-muted" style={{ maxWidth: "300px", display: "inline-block" }}>
-                                    {category.description || "No description"}
-                                  </span>
-                                </td>
-                                <td>
-                                  <button
-                                    className={`btn btn-sm ${category.isActive ? "btn-success" : "btn-secondary"}`}
-                                    onClick={() => handleToggleStatus(category.id, category.isActive)}
-                                    title={category.isActive ? "Click to deactivate" : "Click to activate"}
-                                  >
-                                    {category.isActive ? (
-                                      <>
-                                        <i className="bi bi-check-circle me-1"></i>
-                                        Active
-                                      </>
-                                    ) : (
-                                      <>
-                                        <i className="bi bi-x-circle me-1"></i>
-                                        Inactive
-                                      </>
-                                    )}
-                                  </button>
-                                </td>
-                                <td>
-                                  <span className="badge bg-info">
-                                    {category.prompts?.length || 0} prompts
-                                  </span>
-                                </td>
-                                <td>
-                                  <div className="btn-group" role="group">
-                                    <Link
-                                      href={`/admin/categories/edit/${category.id}`}
-                                      className="btn btn-sm btn-outline-primary"
-                                      title="Edit"
-                                    >
-                                      <i className="bi bi-pencil"></i>
-                                    </Link>
-                                    <button
-                                      className="btn btn-sm btn-outline-danger"
-                                      onClick={() => handleDelete(category.id)}
-                                      title="Delete"
-                                    >
-                                      <i className="bi bi-trash"></i>
-                                    </button>
-                                  </div>
-                                </td>
-                              </tr>
-                            ))
-                          ) : (
-                            <tr>
-                              <td colSpan={6} className="text-center text-muted py-4">
-                                {searchTerm ? "No categories found matching your search" : "No categories found"}
-                              </td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-
-                    {/* Pagination */}
-                    {totalCount > 0 && (
-                      <div className="d-flex justify-content-between align-items-center mt-4">
-                        <div className="text-muted">
-                          Showing {startItem} to {endItem} of {totalCount} categories
+          ) : filteredCategories.length > 0 ? (
+            <>
+              <div className="row g-4 mb-4">
+                {filteredCategories.map((category) => (
+                  <div key={category.id} className="col-lg-4 col-md-6">
+                    <div
+                      className="card border-0 shadow-sm h-100 hover-lift"
+                      style={{ borderRadius: "20px", overflow: "hidden" }}
+                    >
+                      {category.imageBase64 ? (
+                        <div
+                          className="position-relative"
+                          style={{
+                            height: "200px",
+                            overflow: "hidden",
+                            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                          }}
+                        >
+                          <img
+                            src={`data:image/png;base64,${category.imageBase64}`}
+                            className="w-100 h-100"
+                            alt={category.name}
+                            style={{ objectFit: "cover" }}
+                          />
+                          <div
+                            className="position-absolute top-0 end-0 m-2"
+                          >
+                            <span
+                              className={`badge px-3 py-2 ${
+                                category.isActive ? "bg-success" : "bg-secondary"
+                              }`}
+                            >
+                              {category.isActive ? (
+                                <>
+                                  <i className="bi bi-check-circle me-1"></i>
+                                  Active
+                                </>
+                              ) : (
+                                <>
+                                  <i className="bi bi-x-circle me-1"></i>
+                                  Inactive
+                                </>
+                              )}
+                            </span>
+                          </div>
                         </div>
-                        <nav>
-                          <ul className="pagination mb-0">
-                            <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
-                              <button
-                                className="page-link"
-                                onClick={() => handlePageChange(currentPage - 1)}
-                                disabled={currentPage === 1}
-                              >
-                                <i className="bi bi-chevron-left"></i>
-                              </button>
-                            </li>
-
-                            {/* Page numbers */}
-                            {Array.from({ length: totalPages }, (_, i) => i + 1)
-                              .filter((page) => {
-                                // Show first page, last page, current page, and pages around current
-                                return (
-                                  page === 1 ||
-                                  page === totalPages ||
-                                  (page >= currentPage - 1 && page <= currentPage + 1)
-                                );
-                              })
-                              .map((page, index, array) => {
-                                // Add ellipsis if there's a gap
-                                const showEllipsisBefore = index > 0 && array[index - 1] !== page - 1;
-                                return (
-                                  <React.Fragment key={page}>
-                                    {showEllipsisBefore && (
-                                      <li className="page-item disabled">
-                                        <span className="page-link">...</span>
-                                      </li>
-                                    )}
-                                    <li className={`page-item ${currentPage === page ? "active" : ""}`}>
-                                      <button
-                                        className="page-link"
-                                        onClick={() => handlePageChange(page)}
-                                      >
-                                        {page}
-                                      </button>
-                                    </li>
-                                  </React.Fragment>
-                                );
-                              })}
-
-                            <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
-                              <button
-                                className="page-link"
-                                onClick={() => handlePageChange(currentPage + 1)}
-                                disabled={currentPage === totalPages}
-                              >
-                                <i className="bi bi-chevron-right"></i>
-                              </button>
-                            </li>
-                          </ul>
-                        </nav>
+                      ) : (
+                        <div
+                          className="d-flex align-items-center justify-content-center"
+                          style={{
+                            height: "200px",
+                            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                          }}
+                        >
+                          <i className="bi bi-folder text-white" style={{ fontSize: "4rem", opacity: 0.5 }}></i>
+                          <div className="position-absolute top-0 end-0 m-2">
+                            <span
+                              className={`badge px-3 py-2 ${
+                                category.isActive ? "bg-success" : "bg-secondary"
+                              }`}
+                            >
+                              {category.isActive ? (
+                                <>
+                                  <i className="bi bi-check-circle me-1"></i>
+                                  Active
+                                </>
+                              ) : (
+                                <>
+                                  <i className="bi bi-x-circle me-1"></i>
+                                  Inactive
+                                </>
+                              )}
+                            </span>
+                          </div>
+                        </div>
+                      )}
+                      <div className="card-body p-4 d-flex flex-column">
+                        <h5 className="card-title fw-bold mb-2" style={{ fontSize: "1.25rem" }}>
+                          {category.name}
+                        </h5>
+                        <p className="text-muted small mb-2">
+                          <code className="text-primary">{category.slug || "N/A"}</code>
+                        </p>
+                        <p className="card-text text-muted flex-grow-1 mb-3" style={{ fontSize: "0.9rem" }}>
+                          {category.description || "No description available"}
+                        </p>
+                        <div className="d-flex justify-content-between align-items-center mb-3 pt-3 border-top">
+                          <span
+                            className="badge px-3 py-2"
+                            style={{
+                              background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                              color: "white",
+                            }}
+                          >
+                            <i className="bi bi-lightning-charge me-1"></i>
+                            {category.prompts?.length || 0} Prompts
+                          </span>
+                        </div>
+                        <div className="btn-group w-100" role="group">
+                          <Link
+                            href={`/admin/categories/edit/${category.id}`}
+                            className="btn btn-outline-primary rounded-pill flex-fill"
+                            title="Edit Category"
+                          >
+                            <i className="bi bi-pencil me-1"></i>
+                            Edit
+                          </Link>
+                          <button
+                            className="btn btn-outline-success rounded-pill flex-fill"
+                            onClick={() => handleToggleStatus(category.id, category.isActive, category.name)}
+                            title={category.isActive ? "Deactivate" : "Activate"}
+                          >
+                            <i className={`bi ${category.isActive ? "bi-eye-slash" : "bi-eye"} me-1`}></i>
+                            {category.isActive ? "Hide" : "Show"}
+                          </button>
+                          <button
+                            className="btn btn-outline-danger rounded-pill flex-fill"
+                            onClick={() => handleDelete(category.id, category.name)}
+                            title="Delete Category"
+                          >
+                            <i className="bi bi-trash me-1"></i>
+                            Delete
+                          </button>
+                        </div>
                       </div>
-                    )}
+                    </div>
                   </div>
+                ))}
+              </div>
+
+              {/* Pagination */}
+              {totalCount > 0 && (
+                <div className="row mt-4">
+                  <div className="col-12">
+                    <div
+                      className="card border-0 shadow-sm"
+                      style={{ borderRadius: "16px" }}
+                    >
+                      <div className="card-body p-4">
+                        <div className="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                          <div className="text-muted">
+                            Showing <strong>{startItem}</strong> to <strong>{endItem}</strong> of{" "}
+                            <strong>{totalCount}</strong> categories
+                          </div>
+                          <nav>
+                            <ul className="pagination mb-0">
+                              <li className={`page-item ${currentPage === 1 ? "disabled" : ""}`}>
+                                <button
+                                  className="page-link border-0 rounded-pill me-2"
+                                  onClick={() => handlePageChange(currentPage - 1)}
+                                  disabled={currentPage === 1}
+                                  aria-label="Previous"
+                                  style={{ minWidth: "40px" }}
+                                >
+                                  <i className="bi bi-chevron-left"></i>
+                                </button>
+                              </li>
+
+                              {Array.from({ length: totalPages }, (_, i) => i + 1)
+                                .filter((page) => {
+                                  return (
+                                    page === 1 ||
+                                    page === totalPages ||
+                                    (page >= currentPage - 1 && page <= currentPage + 1)
+                                  );
+                                })
+                                .map((page, index, array) => {
+                                  const showEllipsisBefore = index > 0 && array[index - 1] !== page - 1;
+                                  return (
+                                    <React.Fragment key={page}>
+                                      {showEllipsisBefore && (
+                                        <li className="page-item disabled">
+                                          <span className="page-link border-0">...</span>
+                                        </li>
+                                      )}
+                                      <li className={`page-item ${currentPage === page ? "active" : ""}`}>
+                                        <button
+                                          className={`page-link border-0 rounded-pill ${
+                                            currentPage === page ? "text-white" : ""
+                                          }`}
+                                          onClick={() => handlePageChange(page)}
+                                          style={{
+                                            minWidth: "40px",
+                                            background:
+                                              currentPage === page
+                                                ? "linear-gradient(135deg, #667eea 0%, #764ba2 100%)"
+                                                : "transparent",
+                                          }}
+                                        >
+                                          {page}
+                                        </button>
+                                      </li>
+                                    </React.Fragment>
+                                  );
+                                })}
+
+                              <li className={`page-item ${currentPage === totalPages ? "disabled" : ""}`}>
+                                <button
+                                  className="page-link border-0 rounded-pill ms-2"
+                                  onClick={() => handlePageChange(currentPage + 1)}
+                                  disabled={currentPage === totalPages}
+                                  aria-label="Next"
+                                  style={{ minWidth: "40px" }}
+                                >
+                                  <i className="bi bi-chevron-right"></i>
+                                </button>
+                              </li>
+                            </ul>
+                          </nav>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="col-12">
+              <div
+                className="card border-0 shadow-sm text-center py-5"
+                style={{ borderRadius: "20px" }}
+              >
+                <div className="card-body">
+                  <i className="bi bi-inbox text-muted" style={{ fontSize: "4rem" }}></i>
+                  <h5 className="mt-3 mb-2">No categories found</h5>
+                  <p className="text-muted mb-4">
+                    {searchTerm
+                      ? "Try adjusting your search terms"
+                      : "Get started by creating your first category"}
+                  </p>
+                  {!searchTerm && (
+                    <Link
+                      href="/admin/categories/create"
+                      className="btn btn-primary rounded-pill px-4"
+                      style={{
+                        background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                        border: "none",
+                      }}
+                    >
+                      <i className="bi bi-plus-circle me-2"></i>
+                      Create First Category
+                    </Link>
+                  )}
                 </div>
               </div>
             </div>
           )}
         </div>
+
+        <style jsx global>{`
+          .hover-lift {
+            transition: all 0.3s ease;
+          }
+
+          .hover-lift:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 15px 40px rgba(102, 126, 234, 0.2) !important;
+          }
+
+          .page-link {
+            transition: all 0.3s ease;
+          }
+
+          .page-link:hover:not(.disabled) {
+            transform: translateY(-2px);
+          }
+        `}</style>
       </AdminLayout>
     </AuthGuard>
   );
