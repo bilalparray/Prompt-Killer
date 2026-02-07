@@ -103,6 +103,28 @@ export function AdminTopNav() {
                     <li className="nav-item">
                       <Link
                         className={`nav-link d-flex align-items-center ${
+                          pathname?.startsWith("/admin/prompts") ? "active" : ""
+                        }`}
+                        href="/admin/prompts"
+                      >
+                        <i className="bi bi-lightning-charge me-1"></i>
+                        <span>Prompts</span>
+                      </Link>
+                    </li>
+                    <li className="nav-item">
+                      <Link
+                        className={`nav-link d-flex align-items-center ${
+                          pathname?.startsWith("/admin/prompt-images") ? "active" : ""
+                        }`}
+                        href="/admin/prompt-images"
+                      >
+                        <i className="bi bi-image me-1"></i>
+                        <span>Images</span>
+                      </Link>
+                    </li>
+                    <li className="nav-item">
+                      <Link
+                        className={`nav-link d-flex align-items-center ${
                           pathname?.startsWith("/admin/users") ? "active" : ""
                         }`}
                         href="/admin/users"

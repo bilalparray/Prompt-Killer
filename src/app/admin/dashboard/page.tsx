@@ -120,6 +120,22 @@ export default function AdminDashboardPage() {
                   <div className="card shadow-sm h-100 hover-lift">
                     <div className="card-body">
                       <div className="d-flex align-items-center mb-3">
+                        <i className="bi bi-lightning-charge text-primary fs-1 me-3"></i>
+                        <div>
+                          <h5 className="card-title mb-0">Prompts</h5>
+                          <p className="text-muted small mb-0">Manage AI prompts</p>
+                        </div>
+                      </div>
+                      <Link href="/admin/prompts" className="btn btn-outline-primary btn-sm">
+                        Manage Prompts
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-4">
+                  <div className="card shadow-sm h-100 hover-lift">
+                    <div className="card-body">
+                      <div className="d-flex align-items-center mb-3">
                         <i className="bi bi-people text-primary fs-1 me-3"></i>
                         <div>
                           <h5 className="card-title mb-0">User Management</h5>

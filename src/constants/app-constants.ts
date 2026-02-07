@@ -14,6 +14,8 @@ export const AppConstants = {
     ApplicationFile: "api/v1/ApplicationFile",
     ClientCompanyAdditionalInfo: "api/v1/ClientCompanyAdditionalInfo",
     CATEGORY: "api/v1/Category",
+    PROMPT: "api/v1/Prompt",
+    PROMPT_IMAGES: "api/v1/PromptImages",
   },
   DATABASE_KEYS: {
     ACCESS_TOKEN: "ACCESS_TOKEN",
@@ -73,6 +75,8 @@ export const AppConstants = {
       SETTINGS: "admin/settings",
       USERS: "admin/users",
       CATEGORIES: "admin/categories",
+      PROMPTS: "admin/prompts",
+      PROMPT_IMAGES: "admin/prompt-images",
     },
     // Legacy routes (for backward compatibility)
     ENDUSER: {
