@@ -52,7 +52,7 @@ export default function ContactPage() {
             <div className="col-lg-8 mx-auto text-center text-white">
               <h1 className="display-3 fw-bold mb-4">Get In Touch</h1>
               <p className="lead" style={{ opacity: 0.95 }}>
-                Have a question or suggestion? We'd love to hear from you!
+                Have a question or suggestion? We&apos;d love to hear from you!
               </p>
             </div>
           </div>

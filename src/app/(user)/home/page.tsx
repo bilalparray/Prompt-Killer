@@ -419,7 +419,7 @@ export default function HomePage() {
                         ))}
                       </div>
                       <p className="text-muted mb-0" style={{ fontStyle: "italic" }}>
-                        "{testimonial.text}"
+                        &quot;{testimonial.text}&quot;
                       </p>
                     </div>
                     <div className="d-flex align-items-center mt-4 pt-3 border-top">

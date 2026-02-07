@@ -1,4 +1,4 @@
-import { ApiErrorTypeSM } from "../../enums/api-error-type-s-m.enum";
+import { ApiErrorTypeSM } from "../../../enums/api-error-type-s-m.enum";
 
 export class ErrorData {
   apiErrorType!: ApiErrorTypeSM;

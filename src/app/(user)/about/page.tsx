@@ -101,7 +101,7 @@ export default function AboutPage() {
                   </div>
                   <h3 className="fw-bold mb-3">Our Mission</h3>
                   <p className="text-muted mb-0" style={{ lineHeight: "1.8" }}>
-                    At Prompt Killer, we're dedicated to making AI prompts accessible to everyone.
+                    At Prompt Killer, we&apos;re dedicated to making AI prompts accessible to everyone.
                     Our mission is to provide a curated collection of high-quality prompts that
                     help creators, developers, and artists unlock the full potential of AI tools.
                   </p>
@@ -133,7 +133,7 @@ export default function AboutPage() {
                   <h3 className="fw-bold mb-3">Our Vision</h3>
                   <p className="text-muted mb-0" style={{ lineHeight: "1.8" }}>
                     We envision a future where anyone can easily discover and use AI prompts to
-                    enhance their creativity and productivity. We're building a platform that
+                    enhance their creativity and productivity. We&apos;re building a platform that
                     grows with our community and adapts to the evolving landscape of AI technology.
                   </p>
                 </div>

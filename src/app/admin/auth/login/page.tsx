@@ -161,7 +161,7 @@ export default function AdminLoginPage() {
                   <Link href="/admin/auth/forgotpassword">Forgot Password?</Link>
                 </div>
                 <div className="mt-2 text-center">
-                  <Link href="/admin/auth/register">Don't have an account? Register</Link>
+                  <Link href="/admin/auth/register">Don&apos;t have an account? Register</Link>
                 </div>
                 <div className="mt-2 text-center">
                   <Link href="/home">Back to Home</Link>
