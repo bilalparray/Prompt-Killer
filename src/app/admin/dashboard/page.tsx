@@ -136,6 +136,38 @@ export default function AdminDashboardPage() {
                   <div className="card shadow-sm h-100 hover-lift">
                     <div className="card-body">
                       <div className="d-flex align-items-center mb-3">
+                        <i className="bi bi-image text-primary fs-1 me-3"></i>
+                        <div>
+                          <h5 className="card-title mb-0">Images</h5>
+                          <p className="text-muted small mb-0">Manage prompt images</p>
+                        </div>
+                      </div>
+                      <Link href="/admin/prompt-images" className="btn btn-outline-primary btn-sm">
+                        Manage Images
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-4">
+                  <div className="card shadow-sm h-100 hover-lift">
+                    <div className="card-body">
+                      <div className="d-flex align-items-center mb-3">
+                        <i className="bi bi-fire text-warning fs-1 me-3"></i>
+                        <div>
+                          <h5 className="card-title mb-0">Trending Prompts</h5>
+                          <p className="text-muted small mb-0">Manage trending prompts</p>
+                        </div>
+                      </div>
+                      <Link href="/admin/trending-prompts" className="btn btn-outline-primary btn-sm">
+                        Manage Trending
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+                <div className="col-md-4">
+                  <div className="card shadow-sm h-100 hover-lift">
+                    <div className="card-body">
+                      <div className="d-flex align-items-center mb-3">
                         <i className="bi bi-people text-primary fs-1 me-3"></i>
                         <div>
                           <h5 className="card-title mb-0">User Management</h5>
