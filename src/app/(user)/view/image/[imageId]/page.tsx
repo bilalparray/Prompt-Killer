@@ -90,7 +90,7 @@ export default function ViewImagePromptPage() {
   if (loading) {
     return (
       <UserLayout>
-        <div className="library-page-bg min-vh-100 py-5">
+        <div className="library-page-bg min-vh-100 py-5 library-content-offset">
           <div className="container">
             <div className="text-center py-5">
               <div className="spinner-border text-primary" role="status" style={{ width: "2.5rem", height: "2.5rem" }} />
@@ -105,7 +105,7 @@ export default function ViewImagePromptPage() {
   if (error || !displayPrompt) {
     return (
       <UserLayout>
-        <div className="library-page-bg min-vh-100 py-5">
+        <div className="library-page-bg min-vh-100 py-5 library-content-offset">
           <div className="container">
             <div className="text-center py-5">
               <i className="bi bi-exclamation-circle text-muted" style={{ fontSize: "3rem" }} />
@@ -120,7 +120,7 @@ export default function ViewImagePromptPage() {
 
   return (
     <UserLayout>
-      <div className="library-page-bg min-vh-100 py-4">
+      <div className="library-page-bg min-vh-100 py-4 library-content-offset">
         <div className="container">
           <nav aria-label="breadcrumb" className="library-breadcrumb mb-3">
             <ol className="breadcrumb mb-0">

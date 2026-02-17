@@ -26,6 +26,10 @@ export function UserTopNav() {
 
   if (!showNav) return null;
 
+  /* On home we can use transparent nav over dark hero; on all other pages use solid nav so links are visible */
+  const hasDarkHero = pathname === "/home";
+  const useSolidNav = scrolled || !hasDarkHero;
+
   const navLinks = [
     { href: "/home", label: "Home", icon: "bi-house-door" },
     { href: "/categories", label: "Library", icon: "bi-folder2-open" },
@@ -38,15 +42,15 @@ export function UserTopNav() {
     <>
       <nav
         className={`navbar navbar-expand-lg fixed-top transition-all ${
-          scrolled ? "navbar-scrolled shadow-lg" : "navbar-transparent"
+          useSolidNav ? "navbar-scrolled shadow-lg" : "navbar-transparent"
         }`}
         style={{
-          background: scrolled
+          background: useSolidNav
             ? theme === "dark"
               ? "rgba(26, 26, 46, 0.95)"
               : "rgba(255, 255, 255, 0.95)"
             : "transparent",
-          backdropFilter: scrolled ? "blur(10px)" : "none",
+          backdropFilter: useSolidNav ? "blur(10px)" : "none",
           transition: "all 0.3s ease",
         }}
       >
