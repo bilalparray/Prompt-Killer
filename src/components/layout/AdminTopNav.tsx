@@ -5,14 +5,12 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useCommon } from "@/hooks/useCommon";
-import { useTheme } from "@/hooks/useTheme";
 import { RoleTypeSM } from "@/models/enums/role-type-s-m.enum";
 import { AppConstants } from "@/constants/app-constants";
 
 export function AdminTopNav() {
   const { isAuthenticated, user, logout, hasRole } = useAuth();
   const { showNav } = useCommon();
-  const { theme, toggleTheme } = useTheme();
   const router = useRouter();
   const pathname = usePathname();
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -172,21 +170,6 @@ export function AdminTopNav() {
               </ul>
 
               <ul className="navbar-nav ms-auto align-items-center">
-                <li className="nav-item me-3">
-                  <button
-                    className="btn btn-link nav-link text-white p-0"
-                    onClick={toggleTheme}
-                    aria-label="Toggle theme"
-                    style={{
-                      border: "none",
-                      background: "none",
-                      transition: "transform 0.3s ease",
-                    }}
-                  >
-                    <i className={`bi ${theme === "dark" ? "bi-sun-fill" : "bi-moon-fill"} fs-5`}></i>
-                  </button>
-                </li>
-
                 <li className="nav-item dropdown">
                   <a
                     className="nav-link dropdown-toggle d-flex align-items-center"

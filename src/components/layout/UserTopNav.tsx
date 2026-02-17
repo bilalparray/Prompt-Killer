@@ -5,13 +5,11 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useCommon } from "@/hooks/useCommon";
-import { useTheme } from "@/hooks/useTheme";
 import { AppConstants } from "@/constants/app-constants";
 
 export function UserTopNav() {
   const { isAuthenticated } = useAuth();
   const { showNav } = useCommon();
-  const { theme, toggleTheme } = useTheme();
   const pathname = usePathname();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -45,11 +43,7 @@ export function UserTopNav() {
           useSolidNav ? "navbar-scrolled shadow-lg" : "navbar-transparent"
         }`}
         style={{
-          background: useSolidNav
-            ? theme === "dark"
-              ? "rgba(26, 26, 46, 0.95)"
-              : "rgba(255, 255, 255, 0.95)"
-            : "transparent",
+          background: useSolidNav ? "rgba(255, 255, 255, 0.95)" : "transparent",
           backdropFilter: useSolidNav ? "blur(10px)" : "none",
           transition: "all 0.3s ease",
         }}
@@ -117,25 +111,6 @@ export function UserTopNav() {
             </ul>
 
             <ul className="navbar-nav align-items-center">
-              <li className="nav-item me-3">
-                <button
-                  className="btn btn-link nav-link p-2 rounded-circle"
-                  onClick={toggleTheme}
-                  aria-label="Toggle theme"
-                  style={{
-                    border: "none",
-                    background: "rgba(0,0,0,0.05)",
-                    width: "40px",
-                    height: "40px",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                  }}
-                >
-                  <i className={`bi ${theme === "dark" ? "bi-sun-fill" : "bi-moon-fill"}`}></i>
-                </button>
-              </li>
-
               {isAuthenticated && (
                 <li className="nav-item">
                   <Link

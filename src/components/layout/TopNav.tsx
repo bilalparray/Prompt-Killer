@@ -5,12 +5,9 @@ import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { useCommon } from "@/hooks/useCommon";
-import { useTheme } from "@/hooks/useTheme";
-
 export function TopNav() {
   const { isAuthenticated, user, logout } = useAuth();
   const { showNav } = useCommon();
-  const { theme, toggleTheme } = useTheme();
   const router = useRouter();
   const pathname = usePathname();
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -109,28 +106,6 @@ export function TopNav() {
           </ul>
 
           <ul className="navbar-nav ms-auto align-items-center">
-            {/* Theme Toggle */}
-            <li className="nav-item me-3">
-              <button
-                className="btn btn-link nav-link text-white p-0"
-                onClick={toggleTheme}
-                aria-label="Toggle theme"
-                style={{ 
-                  border: "none", 
-                  background: "none",
-                  transition: "transform 0.3s ease"
-                }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.transform = "rotate(15deg)";
-                }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.transform = "rotate(0deg)";
-                }}
-              >
-                <i className={`bi ${theme === "dark" ? "bi-sun-fill" : "bi-moon-fill"} fs-5`}></i>
-              </button>
-            </li>
-
             {isAuthenticated ? (
               <li className="nav-item dropdown">
                 <a

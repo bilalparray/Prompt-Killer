@@ -14,26 +14,22 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 const themeService = new ThemeService();
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setThemeState] = useState<Theme>("light");
+  const [theme] = useState<Theme>("light");
 
   useEffect(() => {
-    const currentTheme = themeService.getCurrentTheme();
-    setThemeState(currentTheme);
-    themeService.setTheme(currentTheme);
+    themeService.setTheme("light");
   }, []);
 
   const setTheme = (newTheme: Theme) => {
-    setThemeState(newTheme);
-    themeService.setTheme(newTheme);
+    if (newTheme === "light") themeService.setTheme("light");
   };
 
   const toggleTheme = () => {
-    const newTheme = themeService.toggleTheme();
-    setThemeState(newTheme);
+    /* No-op: app is light-only */
   };
 
   const value: ThemeContextType = {
-    theme,
+    theme: "light",
     setTheme,
     toggleTheme,
   };
