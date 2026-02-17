@@ -59,6 +59,31 @@ export class TrendingPromptClient extends BaseApiClient {
     return resp;
   };
 
+  // Get trending prompts (public - for user trending page)
+  GetTrendingPromptsForUser = async (
+    skip: number = 0,
+    top: number = 100
+  ): Promise<ApiResponse<TrendingPromptSM[]>> => {
+    const resp = await this.GetResponseAsync<null, TrendingPromptSM[]>(
+      `${AppConstants.API_ENDPOINTS.TRENDING_PROMPT}?skip=${skip}&top=${top}`,
+      "GET",
+      null,
+      new AdditionalRequestDetails<TrendingPromptSM[]>(false, Authentication.false)
+    );
+    return resp;
+  };
+
+  // Get trending prompt by ID (public - for user view)
+  GetTrendingPromptByIdForUser = async (id: number): Promise<ApiResponse<TrendingPromptSM>> => {
+    const resp = await this.GetResponseAsync<null, TrendingPromptSM>(
+      `${AppConstants.API_ENDPOINTS.TRENDING_PROMPT}/${id}`,
+      "GET",
+      null,
+      new AdditionalRequestDetails<TrendingPromptSM>(false, Authentication.false)
+    );
+    return resp;
+  };
+
   // Get most liked trending prompts (paginated)
   GetMostLikedTrendingPrompts = async (
     skip: number = 0,

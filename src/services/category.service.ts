@@ -53,6 +53,14 @@ export class CategoryService extends BaseService {
     return resp;
   }
 
+  async getCategoryByIdForUser(id: number): Promise<ApiResponse<CategorySM>> {
+    const resp = await this.categoryClient.GetCategoryByIdForUser(id);
+    if (resp.isError) {
+      throw new Error(resp.errorData?.displayMessage || AppConstants.ERROR_PROMPTS.Load_Data_Error);
+    }
+    return resp;
+  }
+
   async createCategory(category: CategorySM): Promise<ApiResponse<BoolResponseRoot>> {
     if (!category || !category.name) {
       throw new Error(AppConstants.ERROR_PROMPTS.Invalid_Input_Data);

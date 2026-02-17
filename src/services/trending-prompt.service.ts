@@ -37,6 +37,22 @@ export class TrendingPromptService extends BaseService {
     return resp;
   }
 
+  async getTrendingPromptsForUser(skip: number = 0, top: number = 100): Promise<ApiResponse<TrendingPromptSM[]>> {
+    const resp = await this.trendingPromptClient.GetTrendingPromptsForUser(skip, top);
+    if (resp.isError) {
+      throw new Error(resp.errorData?.displayMessage || AppConstants.ERROR_PROMPTS.Load_Data_Error);
+    }
+    return resp;
+  }
+
+  async getTrendingPromptByIdForUser(id: number): Promise<ApiResponse<TrendingPromptSM>> {
+    const resp = await this.trendingPromptClient.GetTrendingPromptByIdForUser(id);
+    if (resp.isError) {
+      throw new Error(resp.errorData?.displayMessage || AppConstants.ERROR_PROMPTS.Load_Data_Error);
+    }
+    return resp;
+  }
+
   async getMostLikedTrendingPrompts(skip: number = 0, top: number = 100): Promise<ApiResponse<TrendingPromptSM[]>> {
     const resp = await this.trendingPromptClient.GetMostLikedTrendingPrompts(skip, top);
     if (resp.isError) {

@@ -191,7 +191,7 @@ export default function CategoriesPage() {
                             {category.prompts?.length || 0} Prompts
                           </span>
                           <Link
-                            href={`/categories/${category.slug || category.id}`}
+                            href={`/categories/${category.id}`}
                             className="btn btn-primary rounded-pill px-4"
                             style={{
                               background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",

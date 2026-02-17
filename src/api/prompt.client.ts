@@ -37,6 +37,20 @@ export class PromptClient extends BaseApiClient {
     return resp;
   };
 
+  // Get all prompts (public - for user, filter by isTrending client-side)
+  GetPromptsForUser = async (
+    skip: number = 0,
+    top: number = 100
+  ): Promise<ApiResponse<PromptSM[]>> => {
+    const resp = await this.GetResponseAsync<null, PromptSM[]>(
+      `${AppConstants.API_ENDPOINTS.PROMPT}?skip=${skip}&top=${top}`,
+      "GET",
+      null,
+      new AdditionalRequestDetails<PromptSM[]>(false, Authentication.false)
+    );
+    return resp;
+  };
+
   // Get prompt count
   GetPromptsCount = async (): Promise<ApiResponse<IntResponseRoot>> => {
     const resp = await this.GetResponseAsync<null, IntResponseRoot>(
@@ -55,6 +69,17 @@ export class PromptClient extends BaseApiClient {
       "GET",
       null,
       new AdditionalRequestDetails<PromptSM>(false, Authentication.true)
+    );
+    return resp;
+  };
+
+  // Get prompt by ID (public - for user view)
+  GetPromptByIdForUser = async (id: number): Promise<ApiResponse<PromptSM>> => {
+    const resp = await this.GetResponseAsync<null, PromptSM>(
+      `${AppConstants.API_ENDPOINTS.PROMPT}/${id}`,
+      "GET",
+      null,
+      new AdditionalRequestDetails<PromptSM>(false, Authentication.false)
     );
     return resp;
   };
@@ -83,6 +108,34 @@ export class PromptClient extends BaseApiClient {
       "GET",
       null,
       new AdditionalRequestDetails<IntResponseRoot>(false, Authentication.true)
+    );
+    return resp;
+  };
+
+  // Get prompts by category (public - for user category page)
+  GetPromptsByCategoryForUser = async (
+    categoryId: number,
+    skip: number = 0,
+    top: number = 100
+  ): Promise<ApiResponse<PromptSM[]>> => {
+    const resp = await this.GetResponseAsync<null, PromptSM[]>(
+      `${AppConstants.API_ENDPOINTS.PROMPT}/category/${categoryId}?skip=${skip}&top=${top}`,
+      "GET",
+      null,
+      new AdditionalRequestDetails<PromptSM[]>(false, Authentication.false)
+    );
+    return resp;
+  };
+
+  // Get prompts count by category (public)
+  GetPromptsCountByCategoryForUser = async (
+    categoryId: number
+  ): Promise<ApiResponse<IntResponseRoot>> => {
+    const resp = await this.GetResponseAsync<null, IntResponseRoot>(
+      `${AppConstants.API_ENDPOINTS.PROMPT}/category/count/${categoryId}`,
+      "GET",
+      null,
+      new AdditionalRequestDetails<IntResponseRoot>(false, Authentication.false)
     );
     return resp;
   };

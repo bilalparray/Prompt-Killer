@@ -21,6 +21,14 @@ export class PromptService extends BaseService {
     return resp;
   }
 
+  async getPromptsForUser(skip: number = 0, top: number = 100): Promise<ApiResponse<PromptSM[]>> {
+    const resp = await this.promptClient.GetPromptsForUser(skip, top);
+    if (resp.isError) {
+      throw new Error(resp.errorData?.displayMessage || AppConstants.ERROR_PROMPTS.Load_Data_Error);
+    }
+    return resp;
+  }
+
   async getPromptsCount(): Promise<ApiResponse<IntResponseRoot>> {
     const resp = await this.promptClient.GetPromptsCount();
     if (resp.isError) {
@@ -31,6 +39,14 @@ export class PromptService extends BaseService {
 
   async getPromptById(id: number): Promise<ApiResponse<PromptSM>> {
     const resp = await this.promptClient.GetPromptById(id);
+    if (resp.isError) {
+      throw new Error(resp.errorData?.displayMessage || AppConstants.ERROR_PROMPTS.Load_Data_Error);
+    }
+    return resp;
+  }
+
+  async getPromptByIdForUser(id: number): Promise<ApiResponse<PromptSM>> {
+    const resp = await this.promptClient.GetPromptByIdForUser(id);
     if (resp.isError) {
       throw new Error(resp.errorData?.displayMessage || AppConstants.ERROR_PROMPTS.Load_Data_Error);
     }
@@ -51,6 +67,26 @@ export class PromptService extends BaseService {
 
   async getPromptsCountByCategory(categoryId: number): Promise<ApiResponse<IntResponseRoot>> {
     const resp = await this.promptClient.GetPromptsCountByCategory(categoryId);
+    if (resp.isError) {
+      throw new Error(resp.errorData?.displayMessage || AppConstants.ERROR_PROMPTS.Load_Data_Error);
+    }
+    return resp;
+  }
+
+  async getPromptsByCategoryForUser(
+    categoryId: number,
+    skip: number = 0,
+    top: number = 100
+  ): Promise<ApiResponse<PromptSM[]>> {
+    const resp = await this.promptClient.GetPromptsByCategoryForUser(categoryId, skip, top);
+    if (resp.isError) {
+      throw new Error(resp.errorData?.displayMessage || AppConstants.ERROR_PROMPTS.Load_Data_Error);
+    }
+    return resp;
+  }
+
+  async getPromptsCountByCategoryForUser(categoryId: number): Promise<ApiResponse<IntResponseRoot>> {
+    const resp = await this.promptClient.GetPromptsCountByCategoryForUser(categoryId);
     if (resp.isError) {
       throw new Error(resp.errorData?.displayMessage || AppConstants.ERROR_PROMPTS.Load_Data_Error);
     }

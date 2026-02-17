@@ -37,6 +37,14 @@ export class PromptImageService extends BaseService {
     return resp;
   }
 
+  async getTrendingPromptImagesForUser(skip: number = 0, top: number = 100): Promise<ApiResponse<PromptImageSM[]>> {
+    const resp = await this.promptImageClient.GetTrendingPromptImagesForUser(skip, top);
+    if (resp.isError) {
+      throw new Error(resp.errorData?.displayMessage || AppConstants.ERROR_PROMPTS.Load_Data_Error);
+    }
+    return resp;
+  }
+
   async getTrendingPromptImagesCount(): Promise<ApiResponse<IntResponseRoot>> {
     const resp = await this.promptImageClient.GetTrendingPromptImagesCount();
     if (resp.isError) {
@@ -47,6 +55,14 @@ export class PromptImageService extends BaseService {
 
   async getPromptImageById(id: number): Promise<ApiResponse<PromptImageSM>> {
     const resp = await this.promptImageClient.GetPromptImageById(id);
+    if (resp.isError) {
+      throw new Error(resp.errorData?.displayMessage || AppConstants.ERROR_PROMPTS.Load_Data_Error);
+    }
+    return resp;
+  }
+
+  async getPromptImageByIdForUser(id: number): Promise<ApiResponse<PromptImageSM>> {
+    const resp = await this.promptImageClient.GetPromptImageByIdForUser(id);
     if (resp.isError) {
       throw new Error(resp.errorData?.displayMessage || AppConstants.ERROR_PROMPTS.Load_Data_Error);
     }

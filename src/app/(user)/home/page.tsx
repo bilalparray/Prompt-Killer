@@ -1,10 +1,38 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { UserLayout } from "@/components/layout/UserLayout";
+import { PromptImageService } from "@/services/prompt-image.service";
+import { PromptImageClient } from "@/api/prompt-image.client";
+import { StorageService } from "@/services/storage.service";
+import { StorageCache } from "@/api/helpers/storage-cache.helper";
+import { CommonResponseCodeHandler } from "@/api/helpers/common-response-code-handler.helper";
+import { PromptImageSM } from "@/models/service/app/v1/prompt/prompt-image-s-m";
 
 export default function HomePage() {
+  const [trendingImages, setTrendingImages] = useState<PromptImageSM[]>([]);
+  const [loadingTrending, setLoadingTrending] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const storageService = new StorageService();
+        const storageCache = new StorageCache(storageService);
+        const commonResponseCodeHandler = new CommonResponseCodeHandler(storageService);
+        const client = new PromptImageClient(storageService, storageCache, commonResponseCodeHandler);
+        const service = new PromptImageService(client);
+        const resp = await service.getTrendingPromptImagesForUser(0, 12);
+        if (resp.successData) setTrendingImages(resp.successData);
+      } catch {
+        setTrendingImages([]);
+      } finally {
+        setLoadingTrending(false);
+      }
+    };
+    load();
+  }, []);
+
   const features = [
     {
       icon: "bi-search",
@@ -192,6 +220,88 @@ export default function HomePage() {
             background: "linear-gradient(to top, rgba(255,255,255,0.1), transparent)",
           }}
         ></div>
+      </section>
+
+      {/* Trending Prompt Images - Homepage hero section */}
+      <section className="py-5" style={{ background: "linear-gradient(180deg, #f8f9fa 0%, #fff 100%)" }}>
+        <div className="container">
+          <div className="row mb-4">
+            <div className="col-12 text-center">
+              <h2 className="display-5 fw-bold mb-2">
+                <i className="bi bi-fire text-warning me-2"></i>
+                Trending Now
+              </h2>
+              <p className="lead text-muted">Click any image to see the full prompt</p>
+            </div>
+          </div>
+          {loadingTrending ? (
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status" style={{ width: "3rem", height: "3rem" }}>
+                <span className="visually-hidden">Loading...</span>
+              </div>
+              <p className="mt-3 text-muted">Loading trending prompts...</p>
+            </div>
+          ) : trendingImages.length > 0 ? (
+            <div className="row g-4">
+              {trendingImages.map((img) => (
+                <div key={img.id} className="col-lg-3 col-md-4 col-sm-6">
+                  <Link
+                    href={`/view/image/${img.id}`}
+                    className="text-decoration-none d-block h-100"
+                  >
+                    <div
+                      className="card border-0 shadow-sm h-100 hover-lift overflow-hidden"
+                      style={{ borderRadius: "20px" }}
+                    >
+                      {img.imageBase64 ? (
+                        <div
+                          style={{
+                            height: "220px",
+                            overflow: "hidden",
+                            background: "#f0f0f0",
+                          }}
+                        >
+                          <img
+                            src={`data:image/png;base64,${img.imageBase64}`}
+                            className="w-100 h-100"
+                            alt={img.description || "Trending prompt"}
+                            style={{ objectFit: "cover" }}
+                          />
+                        </div>
+                      ) : (
+                        <div
+                          className="d-flex align-items-center justify-content-center text-muted"
+                          style={{
+                            height: "220px",
+                            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+                            color: "rgba(255,255,255,0.8)",
+                          }}
+                        >
+                          <i className="bi bi-image" style={{ fontSize: "3rem" }}></i>
+                        </div>
+                      )}
+                      <div className="card-body p-3">
+                        <p className="text-muted small mb-0 text-truncate">
+                          {img.description || "View prompt"}
+                        </p>
+                        <span className="badge bg-warning text-dark mt-2">
+                          <i className="bi bi-fire me-1"></i>Trending
+                        </span>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-4">
+              <p className="text-muted mb-0">No trending prompts right now. Check back later!</p>
+              <Link href="/categories" className="btn btn-primary rounded-pill mt-3">
+                Browse Categories
+              </Link>
+            </div>
+          )}
+        </div>
       </section>
 
       {/* Stats Section */}

@@ -62,6 +62,20 @@ export class PromptImageClient extends BaseApiClient {
     return resp;
   };
 
+  // Get trending prompt images (public - for homepage)
+  GetTrendingPromptImagesForUser = async (
+    skip: number = 0,
+    top: number = 100
+  ): Promise<ApiResponse<PromptImageSM[]>> => {
+    const resp = await this.GetResponseAsync<null, PromptImageSM[]>(
+      `${AppConstants.API_ENDPOINTS.PROMPT_IMAGES}/trending?skip=${skip}&top=${top}`,
+      "GET",
+      null,
+      new AdditionalRequestDetails<PromptImageSM[]>(false, Authentication.false)
+    );
+    return resp;
+  };
+
   // Get trending prompt images count
   GetTrendingPromptImagesCount = async (): Promise<ApiResponse<IntResponseRoot>> => {
     const resp = await this.GetResponseAsync<null, IntResponseRoot>(
@@ -80,6 +94,17 @@ export class PromptImageClient extends BaseApiClient {
       "GET",
       null,
       new AdditionalRequestDetails<PromptImageSM>(false, Authentication.true)
+    );
+    return resp;
+  };
+
+  // Get prompt image by ID (public - for user view)
+  GetPromptImageByIdForUser = async (id: number): Promise<ApiResponse<PromptImageSM>> => {
+    const resp = await this.GetResponseAsync<null, PromptImageSM>(
+      `${AppConstants.API_ENDPOINTS.PROMPT_IMAGES}/${id}`,
+      "GET",
+      null,
+      new AdditionalRequestDetails<PromptImageSM>(false, Authentication.false)
     );
     return resp;
   };

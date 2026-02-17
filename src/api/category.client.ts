@@ -82,6 +82,17 @@ export class CategoryClient extends BaseApiClient {
     return resp;
   };
 
+  // Get category by ID (public - for user category detail)
+  GetCategoryByIdForUser = async (id: number): Promise<ApiResponse<CategorySM>> => {
+    const resp = await this.GetResponseAsync<null, CategorySM>(
+      `${AppConstants.API_ENDPOINTS.CATEGORY}/${id}`,
+      "GET",
+      null,
+      new AdditionalRequestDetails<CategorySM>(false, Authentication.false)
+    );
+    return resp;
+  };
+
   // Create category
   CreateCategory = async (
     category: ApiRequest<CategorySM>
