@@ -155,7 +155,7 @@ a {
 
 /* Pages without a dark hero (e.g. /prompts/[id], /view/image/[id]) need top padding so breadcrumb clears fixed navbar */
 .library-content-offset {
-  padding-top: 10rem;
+  padding-top: 11.5rem !important;
 }
 
 /* Clear fixed navbar; first section on Library/Trending/About/Contact etc. */
