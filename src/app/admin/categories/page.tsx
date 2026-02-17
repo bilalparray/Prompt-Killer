@@ -340,6 +340,14 @@ export default function AdminCategoriesPage() {
                         </div>
                         <div className="btn-group w-100" role="group">
                           <Link
+                            href={`/admin/categories/${category.id}/prompts`}
+                            className="btn btn-outline-info rounded-pill flex-fill"
+                            title="Manage Prompts"
+                          >
+                            <i className="bi bi-lightning-charge me-1"></i>
+                            Prompts
+                          </Link>
+                          <Link
                             href={`/admin/categories/edit/${category.id}`}
                             className="btn btn-outline-primary rounded-pill flex-fill"
                             title="Edit Category"
