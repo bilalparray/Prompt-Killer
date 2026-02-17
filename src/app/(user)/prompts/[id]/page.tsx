@@ -11,6 +11,16 @@ import { StorageCache } from "@/api/helpers/storage-cache.helper";
 import { CommonResponseCodeHandler } from "@/api/helpers/common-response-code-handler.helper";
 import { PromptSM } from "@/models/service/app/v1/prompt/prompt-s-m";
 import { PromptTypeSM } from "@/models/enums/prompt-type-s-m.enum";
+import { PromptBlock } from "@/components/user/PromptBlock";
+
+function typeLabel(type: PromptTypeSM): string {
+  switch (type) {
+    case PromptTypeSM.Text: return "Text";
+    case PromptTypeSM.Code: return "Code";
+    case PromptTypeSM.Image: return "Image";
+    default: return "Prompt";
+  }
+}
 
 export default function ViewPromptPage() {
   const params = useParams();
@@ -39,22 +49,15 @@ export default function ViewPromptPage() {
     load();
   }, [id]);
 
-  const typeLabel = (type: PromptTypeSM) => {
-    switch (type) {
-      case PromptTypeSM.Text: return "Text";
-      case PromptTypeSM.Code: return "Code";
-      case PromptTypeSM.Image: return "Image";
-      default: return "Prompt";
-    }
-  };
-
   if (loading) {
     return (
       <UserLayout>
-        <div className="container py-5">
-          <div className="text-center py-5">
-            <div className="spinner-border text-primary" role="status" style={{ width: "3rem", height: "3rem" }} />
-            <p className="mt-3 text-muted">Loading...</p>
+        <div className="library-page-bg min-vh-100 py-5">
+          <div className="container">
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status" style={{ width: "2.5rem", height: "2.5rem" }} />
+              <p className="mt-3 text-muted small">Loading...</p>
+            </div>
           </div>
         </div>
       </UserLayout>
@@ -64,11 +67,13 @@ export default function ViewPromptPage() {
   if (!prompt) {
     return (
       <UserLayout>
-        <div className="container py-5">
-          <div className="text-center py-5">
-            <i className="bi bi-exclamation-circle text-muted" style={{ fontSize: "4rem" }}></i>
-            <h2 className="mt-3">Prompt not found</h2>
-            <Link href="/categories" className="btn btn-primary rounded-pill mt-3">Browse Categories</Link>
+        <div className="library-page-bg min-vh-100 py-5">
+          <div className="container">
+            <div className="text-center py-5">
+              <i className="bi bi-exclamation-circle text-muted" style={{ fontSize: "3rem" }} />
+              <h2 className="h5 mt-3">Prompt not found</h2>
+              <Link href="/categories" className="btn library-btn-primary btn-sm mt-3">Browse library</Link>
+            </div>
           </div>
         </div>
       </UserLayout>
@@ -77,53 +82,40 @@ export default function ViewPromptPage() {
 
   return (
     <UserLayout>
-      <div className="container py-5">
-        <nav aria-label="breadcrumb">
-          <ol className="breadcrumb">
-            <li className="breadcrumb-item"><Link href="/home">Home</Link></li>
-            <li className="breadcrumb-item"><Link href="/categories">Categories</Link></li>
-            <li className="breadcrumb-item active" aria-current="page">{prompt.title}</li>
-          </ol>
-        </nav>
+      <div className="library-page-bg min-vh-100 py-4">
+        <div className="container">
+          <nav aria-label="breadcrumb" className="library-breadcrumb mb-3">
+            <ol className="breadcrumb mb-0">
+              <li className="breadcrumb-item"><Link href="/home">Home</Link></li>
+              <li className="breadcrumb-item"><Link href="/categories">Library</Link></li>
+              <li className="breadcrumb-item active" aria-current="page">{prompt.title}</li>
+            </ol>
+          </nav>
 
-        <div className="card border-0 shadow-sm" style={{ borderRadius: "20px" }}>
-          <div className="card-body p-4 p-lg-5">
-            <div className="d-flex flex-wrap gap-2 mb-3">
-              <span className="badge bg-primary">{typeLabel(prompt.promptType)}</span>
-              {prompt.isTrending && (
-                <span className="badge bg-warning text-dark">
-                  <i className="bi bi-fire me-1"></i>Trending
-                </span>
+          <div className="card library-content-card border-0">
+            <div className="card-body p-4 p-lg-5">
+              <div className="d-flex flex-wrap gap-2 mb-3">
+                <span className="badge library-badge-type">{typeLabel(prompt.promptType)}</span>
+                {prompt.isTrending && (
+                  <span className="badge library-badge-trending">
+                    <i className="bi bi-fire me-1" /> Trending
+                  </span>
+                )}
+                {prompt.likesCount > 0 && (
+                  <span className="badge bg-secondary"><i className="bi bi-heart me-1" />{prompt.likesCount}</span>
+                )}
+              </div>
+              <h1 className="h3 fw-bold mb-3">{prompt.title}</h1>
+              {prompt.description && <p className="text-muted mb-4">{prompt.description}</p>}
+              <PromptBlock promptText={prompt.promptText} label="Prompt text" />
+              {prompt.bestForAITools && (
+                <p className="text-muted small mt-3 mb-0"><strong>Best for:</strong> {prompt.bestForAITools}</p>
               )}
-              {prompt.likesCount > 0 && (
-                <span className="badge bg-info"><i className="bi bi-heart me-1"></i>{prompt.likesCount}</span>
-              )}
+              <hr className="my-4" />
+              <Link href="/categories" className="btn library-btn-outline btn-sm">
+                <i className="bi bi-arrow-left me-2" /> Back to library
+              </Link>
             </div>
-            <h1 className="h2 fw-bold mb-3">{prompt.title}</h1>
-            {prompt.description && <p className="text-muted mb-4">{prompt.description}</p>}
-            <div className="mb-3">
-              <label className="form-label fw-semibold text-muted small">PROMPT TEXT</label>
-              <pre
-                className="p-4 rounded-3 bg-light border"
-                style={{ whiteSpace: "pre-wrap", wordBreak: "break-word", fontSize: "0.95rem", maxHeight: "400px", overflowY: "auto" }}
-              >
-                {prompt.promptText}
-              </pre>
-              <button
-                type="button"
-                className="btn btn-outline-primary btn-sm mt-2"
-                onClick={() => navigator.clipboard.writeText(prompt.promptText)}
-              >
-                <i className="bi bi-clipboard me-1"></i>Copy prompt
-              </button>
-            </div>
-            {prompt.bestForAITools && (
-              <p className="text-muted small mb-0"><strong>Best for:</strong> {prompt.bestForAITools}</p>
-            )}
-            <hr className="my-4" />
-            <Link href="/categories" className="btn btn-primary rounded-pill">
-              <i className="bi bi-arrow-left me-2"></i>Browse Categories
-            </Link>
           </div>
         </div>
       </div>

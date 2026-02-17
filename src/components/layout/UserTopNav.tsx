@@ -28,7 +28,7 @@ export function UserTopNav() {
 
   const navLinks = [
     { href: "/home", label: "Home", icon: "bi-house-door" },
-    { href: "/categories", label: "Categories", icon: "bi-grid-3x3-gap" },
+    { href: "/categories", label: "Library", icon: "bi-folder2-open" },
     { href: "/trending", label: "Trending", icon: "bi-fire" },
     { href: "/about", label: "About", icon: "bi-info-circle" },
     { href: "/contact", label: "Contact", icon: "bi-envelope" },

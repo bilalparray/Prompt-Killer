@@ -16,6 +16,16 @@ import { CommonResponseCodeHandler } from "@/api/helpers/common-response-code-ha
 import { PromptSM } from "@/models/service/app/v1/prompt/prompt-s-m";
 import { TrendingPromptSM } from "@/models/service/app/v1/prompt/trending-prompt-s-m";
 import { PromptTypeSM } from "@/models/enums/prompt-type-s-m.enum";
+import { PromptBlock } from "@/components/user/PromptBlock";
+
+function typeLabel(type: PromptTypeSM): string {
+  switch (type) {
+    case PromptTypeSM.Text: return "Text";
+    case PromptTypeSM.Code: return "Code";
+    case PromptTypeSM.Image: return "Image";
+    default: return "Prompt";
+  }
+}
 
 export default function ViewImagePromptPage() {
   const params = useParams();
@@ -65,7 +75,7 @@ export default function ViewImagePromptPage() {
         } else {
           setError("No prompt linked to this image.");
         }
-      } catch (e) {
+      } catch {
         setError("Something went wrong. Please try again.");
       } finally {
         setLoading(false);
@@ -74,25 +84,18 @@ export default function ViewImagePromptPage() {
     load();
   }, [imageId]);
 
-  const typeLabel = (type: PromptTypeSM) => {
-    switch (type) {
-      case PromptTypeSM.Text: return "Text";
-      case PromptTypeSM.Code: return "Code";
-      case PromptTypeSM.Image: return "Image";
-      default: return "Prompt";
-    }
-  };
-
   const displayPrompt = prompt || trendingPrompt;
   const isTrending = !!trendingPrompt;
 
   if (loading) {
     return (
       <UserLayout>
-        <div className="container py-5">
-          <div className="text-center py-5">
-            <div className="spinner-border text-primary" role="status" style={{ width: "3rem", height: "3rem" }} />
-            <p className="mt-3 text-muted">Loading...</p>
+        <div className="library-page-bg min-vh-100 py-5">
+          <div className="container">
+            <div className="text-center py-5">
+              <div className="spinner-border text-primary" role="status" style={{ width: "2.5rem", height: "2.5rem" }} />
+              <p className="mt-3 text-muted small">Loading...</p>
+            </div>
           </div>
         </div>
       </UserLayout>
@@ -102,11 +105,13 @@ export default function ViewImagePromptPage() {
   if (error || !displayPrompt) {
     return (
       <UserLayout>
-        <div className="container py-5">
-          <div className="text-center py-5">
-            <i className="bi bi-exclamation-circle text-muted" style={{ fontSize: "4rem" }}></i>
-            <h2 className="mt-3">{error || "Prompt not found"}</h2>
-            <Link href="/home" className="btn btn-primary rounded-pill mt-3">Back to Home</Link>
+        <div className="library-page-bg min-vh-100 py-5">
+          <div className="container">
+            <div className="text-center py-5">
+              <i className="bi bi-exclamation-circle text-muted" style={{ fontSize: "3rem" }} />
+              <h2 className="h5 mt-3">{error || "Prompt not found"}</h2>
+              <Link href="/home" className="btn library-btn-primary btn-sm mt-3">Back to home</Link>
+            </div>
           </div>
         </div>
       </UserLayout>
@@ -115,93 +120,62 @@ export default function ViewImagePromptPage() {
 
   return (
     <UserLayout>
-      <div className="container py-5">
-        <nav aria-label="breadcrumb">
-          <ol className="breadcrumb">
-            <li className="breadcrumb-item"><Link href="/home">Home</Link></li>
-            <li className="breadcrumb-item"><Link href="/trending">Trending</Link></li>
-            <li className="breadcrumb-item active" aria-current="page">View Prompt</li>
-          </ol>
-        </nav>
+      <div className="library-page-bg min-vh-100 py-4">
+        <div className="container">
+          <nav aria-label="breadcrumb" className="library-breadcrumb mb-3">
+            <ol className="breadcrumb mb-0">
+              <li className="breadcrumb-item"><Link href="/home">Home</Link></li>
+              <li className="breadcrumb-item"><Link href="/trending">Trending</Link></li>
+              <li className="breadcrumb-item active" aria-current="page">View prompt</li>
+            </ol>
+          </nav>
 
-        <div className="row">
-          <div className="col-lg-5 mb-4 mb-lg-0">
-            {image?.imageBase64 && (
-              <div
-                className="card border-0 shadow-sm overflow-hidden"
-                style={{ borderRadius: "20px" }}
-              >
-                <img
-                  src={`data:image/png;base64,${image.imageBase64}`}
-                  className="w-100"
-                  alt={image.description || "Prompt"}
-                  style={{ objectFit: "cover", maxHeight: "500px" }}
-                />
-                {image.description && (
-                  <div className="card-body">
-                    <p className="text-muted small mb-0">{image.description}</p>
+          <div className="row g-4">
+            <div className="col-lg-5">
+              {image?.imageBase64 && (
+                <div className="card library-content-card border-0 overflow-hidden">
+                  <img
+                    src={`data:image/png;base64,${image.imageBase64}`}
+                    className="w-100"
+                    alt={image.description || "Prompt"}
+                    style={{ objectFit: "cover", maxHeight: "400px" }}
+                  />
+                  {image.description && (
+                    <div className="card-body py-2">
+                      <p className="text-muted small mb-0">{image.description}</p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+            <div className="col-lg-7">
+              <div className="card library-content-card border-0 h-100">
+                <div className="card-body p-4 p-lg-5">
+                  <div className="d-flex flex-wrap gap-2 mb-3">
+                    <span className="badge library-badge-type">{typeLabel(displayPrompt.promptType)}</span>
+                    {isTrending && (
+                      <span className="badge library-badge-trending">
+                        <i className="bi bi-fire me-1" /> Trending
+                      </span>
+                    )}
+                    {"likesCount" in displayPrompt && (displayPrompt as PromptSM).likesCount > 0 && (
+                      <span className="badge bg-secondary">
+                        <i className="bi bi-heart me-1" />{(displayPrompt as PromptSM).likesCount}
+                      </span>
+                    )}
                   </div>
-                )}
-              </div>
-            )}
-          </div>
-          <div className="col-lg-7">
-            <div className="card border-0 shadow-sm h-100" style={{ borderRadius: "20px" }}>
-              <div className="card-body p-4 p-lg-5">
-                <div className="d-flex flex-wrap gap-2 mb-3">
-                  <span className="badge bg-primary">{typeLabel(displayPrompt.promptType)}</span>
-                  {isTrending && (
-                    <span className="badge bg-warning text-dark">
-                      <i className="bi bi-fire me-1"></i>Trending
-                    </span>
+                  <h1 className="h3 fw-bold mb-3">{displayPrompt.title}</h1>
+                  {displayPrompt.description && (
+                    <p className="text-muted mb-4">{displayPrompt.description}</p>
                   )}
-                  {"likesCount" in displayPrompt && (displayPrompt as PromptSM).likesCount > 0 && (
-                    <span className="badge bg-info">
-                      <i className="bi bi-heart me-1"></i>{(displayPrompt as PromptSM).likesCount}
-                    </span>
+                  <PromptBlock promptText={displayPrompt.promptText} label="Prompt text" />
+                  {displayPrompt.bestForAITools && (
+                    <p className="text-muted small mt-3 mb-0"><strong>Best for:</strong> {displayPrompt.bestForAITools}</p>
                   )}
+                  <hr className="my-4" />
+                  <Link href="/home" className="btn library-btn-outline btn-sm me-2">Back to home</Link>
+                  <Link href="/trending" className="btn library-btn-primary btn-sm">More trending</Link>
                 </div>
-                <h1 className="h2 fw-bold mb-3">{displayPrompt.title}</h1>
-                {displayPrompt.description && (
-                  <p className="text-muted mb-4">{displayPrompt.description}</p>
-                )}
-                <div className="mb-3">
-                  <label className="form-label fw-semibold text-muted small">PROMPT TEXT</label>
-                  <pre
-                    className="p-4 rounded-3 bg-light border"
-                    style={{
-                      whiteSpace: "pre-wrap",
-                      wordBreak: "break-word",
-                      fontSize: "0.95rem",
-                      maxHeight: "400px",
-                      overflowY: "auto",
-                    }}
-                  >
-                    {displayPrompt.promptText}
-                  </pre>
-                  <button
-                    type="button"
-                    className="btn btn-outline-primary btn-sm mt-2"
-                    onClick={() => {
-                      navigator.clipboard.writeText(displayPrompt.promptText);
-                      // optional: toast
-                    }}
-                  >
-                    <i className="bi bi-clipboard me-1"></i>Copy prompt
-                  </button>
-                </div>
-                {displayPrompt.bestForAITools && (
-                  <p className="text-muted small mb-0">
-                    <strong>Best for:</strong> {displayPrompt.bestForAITools}
-                  </p>
-                )}
-                <hr className="my-4" />
-                <Link href="/home" className="btn btn-primary rounded-pill">
-                  <i className="bi bi-arrow-left me-2"></i>Back to Home
-                </Link>
-                <Link href="/trending" className="btn btn-outline-secondary rounded-pill ms-2">
-                  More Trending
-                </Link>
               </div>
             </div>
           </div>

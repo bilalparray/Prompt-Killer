@@ -128,12 +128,8 @@ export function ContactForm() {
       <div className="d-grid">
         <button
           type="submit"
-          className="btn btn-primary btn-lg rounded-pill fw-semibold py-3"
+          className="btn btn-lg rounded-pill fw-semibold py-3 library-btn-primary"
           disabled={isSubmitting}
-          style={{
-            background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-            border: "none",
-          }}
         >
           {isSubmitting ? (
             <>

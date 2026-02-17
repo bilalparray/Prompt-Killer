@@ -12,7 +12,8 @@ import { StorageCache } from "@/api/helpers/storage-cache.helper";
 import { CommonResponseCodeHandler } from "@/api/helpers/common-response-code-handler.helper";
 import { PromptSM } from "@/models/service/app/v1/prompt/prompt-s-m";
 import { PromptImageSM } from "@/models/service/app/v1/prompt/prompt-image-s-m";
-import { PromptTypeSM } from "@/models/enums/prompt-type-s-m.enum";
+import { PromptCard } from "@/components/user/PromptCard";
+import { TrendingImageCard } from "@/components/user/TrendingImageCard";
 
 export default function TrendingPage() {
   const [trendingPrompts, setTrendingPrompts] = useState<PromptSM[]>([]);
@@ -51,143 +52,95 @@ export default function TrendingPage() {
     load();
   }, []);
 
-  const typeLabel = (type: PromptTypeSM) => {
-    switch (type) {
-      case PromptTypeSM.Text: return "Text";
-      case PromptTypeSM.Code: return "Code";
-      case PromptTypeSM.Image: return "Image";
-      default: return "Prompt";
-    }
-  };
-
   return (
     <UserLayout>
-      <section
-        className="position-relative overflow-hidden"
-        style={{
-          background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
-          paddingTop: "120px",
-          paddingBottom: "60px",
-        }}
-      >
-        <div className="container position-relative z-2 text-center text-white">
-          <h1 className="display-4 fw-bold mb-3">
-            <i className="bi bi-fire text-warning me-2"></i>
+      <section className="library-hero pb-4">
+        <div className="container">
+          <nav aria-label="breadcrumb" className="library-breadcrumb mb-2">
+            <ol className="breadcrumb mb-0">
+              <li className="breadcrumb-item"><Link href="/home" className="text-white-50">Home</Link></li>
+              <li className="breadcrumb-item active text-white" aria-current="page">Trending</li>
+            </ol>
+          </nav>
+          <h1 className="h2 fw-bold text-white mb-2">
+            <i className="bi bi-fire text-warning me-2" />
             Trending
           </h1>
-          <p className="lead mb-0" style={{ opacity: 0.95 }}>
-            Most popular prompts and featured images
-          </p>
+          <p className="text-white-50 mb-0 small">Popular prompts and featured images</p>
         </div>
       </section>
 
-      <section className="py-5" style={{ background: "#f8f9fa", minHeight: "60vh" }}>
+      <section className="py-5 library-page-bg" style={{ minHeight: "50vh" }}>
         <div className="container">
-          <ul className="nav nav-pills justify-content-center gap-2 mb-4">
+          <ul className="nav nav-pills gap-2 mb-4">
             <li className="nav-item">
               <button
-                className={`nav-link rounded-pill px-4 ${activeTab === "images" ? "active" : ""}`}
-                style={activeTab === "images" ? { background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", border: "none" } : {}}
-                onClick={() => setActiveTab("images")}
+                type="button"
+                className={`nav-link rounded-pill px-3 py-2 ${activeTab === "prompts" ? "active" : ""}`}
+                style={
+                  activeTab === "prompts"
+                    ? { background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", border: "none", color: "#fff" }
+                    : { background: "#fff", color: "#4a5568" }
+                }
+                onClick={() => setActiveTab("prompts")}
               >
-                <i className="bi bi-image me-2"></i>Trending Images
+                <i className="bi bi-lightning-charge me-2" /> Prompts
               </button>
             </li>
             <li className="nav-item">
               <button
-                className={`nav-link rounded-pill px-4 ${activeTab === "prompts" ? "active" : ""}`}
-                style={activeTab === "prompts" ? { background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", border: "none" } : {}}
-                onClick={() => setActiveTab("prompts")}
+                type="button"
+                className={`nav-link rounded-pill px-3 py-2 ${activeTab === "images" ? "active" : ""}`}
+                style={
+                  activeTab === "images"
+                    ? { background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", border: "none", color: "#fff" }
+                    : { background: "#fff", color: "#4a5568" }
+                }
+                onClick={() => setActiveTab("images")}
               >
-                <i className="bi bi-lightning-charge me-2"></i>Trending Prompts
+                <i className="bi bi-image me-2" /> Images
               </button>
             </li>
           </ul>
 
           {loading ? (
             <div className="text-center py-5">
-              <div className="spinner-border text-primary" role="status" style={{ width: "3rem", height: "3rem" }} />
-              <p className="mt-3 text-muted">Loading...</p>
+              <div className="spinner-border text-primary" role="status" style={{ width: "2.5rem", height: "2.5rem" }} />
+              <p className="mt-3 text-muted small">Loading...</p>
             </div>
           ) : activeTab === "images" ? (
             trendingImages.length > 0 ? (
-              <div className="row g-4">
+              <div className="row g-3 g-md-4">
                 {trendingImages.map((img) => (
-                  <div key={img.id} className="col-lg-3 col-md-4 col-sm-6">
-                    <Link href={`/view/image/${img.id}`} className="text-decoration-none d-block h-100">
-                      <div className="card border-0 shadow-sm h-100 hover-lift overflow-hidden" style={{ borderRadius: "20px" }}>
-                        {img.imageBase64 ? (
-                          <div style={{ height: "220px", overflow: "hidden", background: "#f0f0f0" }}>
-                            <img
-                              src={`data:image/png;base64,${img.imageBase64}`}
-                              className="w-100 h-100"
-                              alt={img.description || "Trending"}
-                              style={{ objectFit: "cover" }}
-                            />
-                          </div>
-                        ) : (
-                          <div
-                            className="d-flex align-items-center justify-content-center text-muted"
-                            style={{ height: "220px", background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", color: "rgba(255,255,255,0.8)" }}
-                          >
-                            <i className="bi bi-image" style={{ fontSize: "3rem" }}></i>
-                          </div>
-                        )}
-                        <div className="card-body p-3">
-                          <p className="text-muted small mb-0 text-truncate">{img.description || "View prompt"}</p>
-                          <span className="badge bg-warning text-dark mt-2"><i className="bi bi-fire me-1"></i>Trending</span>
-                        </div>
-                      </div>
-                    </Link>
+                  <div key={img.id} className="col-6 col-md-4 col-lg-3">
+                    <TrendingImageCard image={img} />
                   </div>
                 ))}
               </div>
             ) : (
               <div className="text-center py-5">
-                <i className="bi bi-image text-muted" style={{ fontSize: "4rem" }}></i>
-                <h5 className="mt-3">No trending images yet</h5>
-                <Link href="/categories" className="btn btn-primary rounded-pill mt-3">Browse Categories</Link>
+                <i className="bi bi-image text-muted" style={{ fontSize: "3rem" }} />
+                <p className="mt-3 text-muted mb-0">No trending images yet.</p>
+                <Link href="/categories" className="btn library-btn-primary btn-sm mt-3">Browse library</Link>
               </div>
             )
           ) : trendingPrompts.length > 0 ? (
-            <div className="row g-4">
+            <div className="row g-3 g-md-4">
               {trendingPrompts.map((p) => (
-                <div key={p.id} className="col-lg-4 col-md-6">
-                  <div className="card border-0 shadow-sm h-100 hover-lift" style={{ borderRadius: "20px" }}>
-                    <div className="card-body p-4 d-flex flex-column">
-                      <span className="badge bg-primary mb-2">{typeLabel(p.promptType)}</span>
-                      <span className="badge bg-warning text-dark mb-2"><i className="bi bi-fire me-1"></i>Trending</span>
-                      <h5 className="card-title fw-bold mb-2">{p.title}</h5>
-                      <p className="text-muted small flex-grow-1 mb-3">{p.description || "No description"}</p>
-                      <p className="small text-muted mb-3" style={{ maxHeight: "4em", overflow: "hidden", textOverflow: "ellipsis" }}>{p.promptText}</p>
-                      <div className="mt-auto pt-3 border-top">
-                        <Link
-                          href={`/prompts/${p.id}`}
-                          className="btn btn-primary rounded-pill w-100"
-                          style={{ background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)", border: "none" }}
-                        >
-                          View & Copy <i className="bi bi-arrow-right ms-2"></i>
-                        </Link>
-                      </div>
-                    </div>
-                  </div>
+                <div key={p.id} className="col-md-6 col-lg-4">
+                  <PromptCard prompt={p} showTrendingBadge={true} />
                 </div>
               ))}
             </div>
-          ) : activeTab === "prompts" ? (
+          ) : (
             <div className="text-center py-5">
-              <i className="bi bi-lightning-charge text-muted" style={{ fontSize: "4rem" }}></i>
-              <h5 className="mt-3">No trending prompts yet</h5>
-              <Link href="/categories" className="btn btn-primary rounded-pill mt-3">Browse Categories</Link>
+              <i className="bi bi-lightning-charge text-muted" style={{ fontSize: "3rem" }} />
+              <p className="mt-3 text-muted mb-0">No trending prompts yet.</p>
+              <Link href="/categories" className="btn library-btn-primary btn-sm mt-3">Browse library</Link>
             </div>
-          ) : null}
+          )}
         </div>
       </section>
-
-      <style jsx global>{`
-        .hover-lift { transition: all 0.3s ease; }
-        .hover-lift:hover { transform: translateY(-6px); box-shadow: 0 12px 30px rgba(102, 126, 234, 0.2) !important; }
-      `}</style>
     </UserLayout>
   );
 }
