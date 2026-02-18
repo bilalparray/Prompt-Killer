@@ -7,6 +7,7 @@ import { BaseApiClient } from "./base/base-api.client";
 import { PromptSM } from "@/models/service/app/v1/prompt/prompt-s-m";
 import { ApiRequest } from "@/models/service/foundation/api-contracts/base/api-request";
 import { ApiResponse } from "@/models/service/foundation/api-contracts/base/api-response";
+import { ErrorData } from "@/models/service/foundation/api-contracts/error-data";
 import { BoolResponseRoot } from "@/models/service/foundation/common-response/bool-response-root";
 import { DeleteResponseRoot } from "@/models/service/foundation/common-response/delete-response-root";
 import { IntResponseRoot } from "@/models/service/foundation/common-response/int-response-root";
@@ -87,7 +88,13 @@ export class PromptClient extends BaseApiClient {
   // Search prompts (public - for user)
   SearchPromptsForUser = async (searchString: string): Promise<ApiResponse<PromptSM[]>> => {
     if (!searchString?.trim()) {
-      return { isError: false, successData: [] };
+      const empty = new ApiResponse<PromptSM[]>();
+      empty.responseStatusCode = 200;
+      empty.successData = [];
+      empty.isError = false;
+      empty.errorData = new ErrorData();
+      empty.axiosResponse = null;
+      return empty;
     }
     const resp = await this.GetResponseAsync<null, PromptSM[]>(
       `${AppConstants.API_ENDPOINTS.PROMPT}/search?searchString=${encodeURIComponent(searchString.trim())}`,
@@ -101,7 +108,13 @@ export class PromptClient extends BaseApiClient {
   // Search prompts (admin - with auth)
   SearchPromptsForAdmin = async (searchString: string): Promise<ApiResponse<PromptSM[]>> => {
     if (!searchString?.trim()) {
-      return { isError: false, successData: [] };
+      const empty = new ApiResponse<PromptSM[]>();
+      empty.responseStatusCode = 200;
+      empty.successData = [];
+      empty.isError = false;
+      empty.errorData = new ErrorData();
+      empty.axiosResponse = null;
+      return empty;
     }
     const resp = await this.GetResponseAsync<null, PromptSM[]>(
       `${AppConstants.API_ENDPOINTS.PROMPT}/search?searchString=${encodeURIComponent(searchString.trim())}`,

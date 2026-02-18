@@ -7,6 +7,7 @@ import { BaseApiClient } from "./base/base-api.client";
 import { CategorySM } from "@/models/service/app/v1/category/category-s-m";
 import { ApiRequest } from "@/models/service/foundation/api-contracts/base/api-request";
 import { ApiResponse } from "@/models/service/foundation/api-contracts/base/api-response";
+import { ErrorData } from "@/models/service/foundation/api-contracts/error-data";
 import { BoolResponseRoot } from "@/models/service/foundation/common-response/bool-response-root";
 import { DeleteResponseRoot } from "@/models/service/foundation/common-response/delete-response-root";
 import { IntResponseRoot } from "@/models/service/foundation/common-response/int-response-root";
@@ -96,7 +97,13 @@ export class CategoryClient extends BaseApiClient {
   // Search categories (public - for user)
   SearchCategoriesForUser = async (searchString: string): Promise<ApiResponse<CategorySM[]>> => {
     if (!searchString?.trim()) {
-      return { isError: false, successData: [] };
+      const empty = new ApiResponse<CategorySM[]>();
+      empty.responseStatusCode = 200;
+      empty.successData = [];
+      empty.isError = false;
+      empty.errorData = new ErrorData();
+      empty.axiosResponse = null;
+      return empty;
     }
     const resp = await this.GetResponseAsync<null, CategorySM[]>(
       `${AppConstants.API_ENDPOINTS.CATEGORY}/search?searchString=${encodeURIComponent(searchString.trim())}`,
@@ -110,7 +117,13 @@ export class CategoryClient extends BaseApiClient {
   // Search categories (admin - with auth)
   SearchCategoriesForAdmin = async (searchString: string): Promise<ApiResponse<CategorySM[]>> => {
     if (!searchString?.trim()) {
-      return { isError: false, successData: [] };
+      const empty = new ApiResponse<CategorySM[]>();
+      empty.responseStatusCode = 200;
+      empty.successData = [];
+      empty.isError = false;
+      empty.errorData = new ErrorData();
+      empty.axiosResponse = null;
+      return empty;
     }
     const resp = await this.GetResponseAsync<null, CategorySM[]>(
       `${AppConstants.API_ENDPOINTS.CATEGORY}/search?searchString=${encodeURIComponent(searchString.trim())}`,
