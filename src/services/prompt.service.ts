@@ -53,6 +53,22 @@ export class PromptService extends BaseService {
     return resp;
   }
 
+  async searchPromptsForUser(searchString: string): Promise<ApiResponse<PromptSM[]>> {
+    const resp = await this.promptClient.SearchPromptsForUser(searchString);
+    if (resp.isError) {
+      throw new Error(resp.errorData?.displayMessage || AppConstants.ERROR_PROMPTS.Load_Data_Error);
+    }
+    return resp;
+  }
+
+  async searchPromptsForAdmin(searchString: string): Promise<ApiResponse<PromptSM[]>> {
+    const resp = await this.promptClient.SearchPromptsForAdmin(searchString);
+    if (resp.isError) {
+      throw new Error(resp.errorData?.displayMessage || AppConstants.ERROR_PROMPTS.Load_Data_Error);
+    }
+    return resp;
+  }
+
   async getPromptsByCategory(
     categoryId: number,
     skip: number = 0,

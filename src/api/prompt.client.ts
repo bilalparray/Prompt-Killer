@@ -84,6 +84,34 @@ export class PromptClient extends BaseApiClient {
     return resp;
   };
 
+  // Search prompts (public - for user)
+  SearchPromptsForUser = async (searchString: string): Promise<ApiResponse<PromptSM[]>> => {
+    if (!searchString?.trim()) {
+      return { isError: false, successData: [] };
+    }
+    const resp = await this.GetResponseAsync<null, PromptSM[]>(
+      `${AppConstants.API_ENDPOINTS.PROMPT}/search?searchString=${encodeURIComponent(searchString.trim())}`,
+      "GET",
+      null,
+      new AdditionalRequestDetails<PromptSM[]>(false, Authentication.false)
+    );
+    return resp;
+  };
+
+  // Search prompts (admin - with auth)
+  SearchPromptsForAdmin = async (searchString: string): Promise<ApiResponse<PromptSM[]>> => {
+    if (!searchString?.trim()) {
+      return { isError: false, successData: [] };
+    }
+    const resp = await this.GetResponseAsync<null, PromptSM[]>(
+      `${AppConstants.API_ENDPOINTS.PROMPT}/search?searchString=${encodeURIComponent(searchString.trim())}`,
+      "GET",
+      null,
+      new AdditionalRequestDetails<PromptSM[]>(false, Authentication.true)
+    );
+    return resp;
+  };
+
   // Get prompts by category (paginated)
   GetPromptsByCategory = async (
     categoryId: number,

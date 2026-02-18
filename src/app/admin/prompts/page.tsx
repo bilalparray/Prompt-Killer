@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { AuthGuard } from "@/guards/AuthGuard";
 import { useCommon } from "@/hooks/useCommon";
+import { useRouter } from "next/navigation";
 import { RoleTypeSM } from "@/models/enums/role-type-s-m.enum";
 import { PromptService } from "@/services/prompt.service";
 import { PromptClient } from "@/api/prompt.client";
@@ -17,8 +18,11 @@ import { PromptTypeSM } from "@/models/enums/prompt-type-s-m.enum";
 import { CategorySM } from "@/models/service/app/v1/category/category-s-m";
 import Link from "next/link";
 
+const SEARCH_DEBOUNCE_MS = 350;
+
 export default function AdminPromptsPage() {
   const { commonService } = useCommon();
+  const router = useRouter();
   const [prompts, setPrompts] = useState<PromptSM[]>([]);
   const [categories, setCategories] = useState<CategorySM[]>([]);
   const [loading, setLoading] = useState(true);
@@ -27,6 +31,12 @@ export default function AdminPromptsPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(12);
   const [totalCount, setTotalCount] = useState(0);
+  const [apiSearchQuery, setApiSearchQuery] = useState("");
+  const [apiSearchResults, setApiSearchResults] = useState<PromptSM[]>([]);
+  const [apiSearchLoading, setApiSearchLoading] = useState(false);
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const searchDropdownRef = useRef<HTMLDivElement>(null);
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     loadCategories();
@@ -35,6 +45,53 @@ export default function AdminPromptsPage() {
   useEffect(() => {
     loadPrompts();
   }, [currentPage, selectedCategory]);
+
+  const runApiSearch = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setApiSearchResults([]);
+      return;
+    }
+    setApiSearchLoading(true);
+    try {
+      const storageService = new StorageService();
+      const storageCache = new StorageCache(storageService);
+      const commonResponseCodeHandler = new CommonResponseCodeHandler(storageService);
+      const promptClient = new PromptClient(storageService, storageCache, commonResponseCodeHandler);
+      const promptService = new PromptService(promptClient);
+      const resp = await promptService.searchPromptsForAdmin(query);
+      setApiSearchResults(resp.successData ?? []);
+      setShowSearchDropdown(true);
+    } catch {
+      setApiSearchResults([]);
+    } finally {
+      setApiSearchLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    if (!apiSearchQuery.trim()) {
+      setApiSearchResults([]);
+      setShowSearchDropdown(false);
+      return;
+    }
+    searchDebounceRef.current = setTimeout(() => {
+      runApiSearch(apiSearchQuery);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => {
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    };
+  }, [apiSearchQuery, runApiSearch]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchDropdownRef.current && !searchDropdownRef.current.contains(e.target as Node)) {
+        setShowSearchDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const loadCategories = async () => {
     try {
@@ -255,6 +312,64 @@ export default function AdminPromptsPage() {
             </div>
           </div>
 
+          {/* Quick find: API search */}
+          <div className="row mb-3">
+            <div className="col-12">
+              <div className="position-relative d-inline-block" ref={searchDropdownRef} style={{ minWidth: "280px" }}>
+                <label className="form-label small text-muted mb-1">Quick find prompt (by search API)</label>
+                <div className="input-group">
+                  <span className="input-group-text bg-white">
+                    <i className="bi bi-search text-muted" />
+                  </span>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="e.g. how to generate image..."
+                    value={apiSearchQuery}
+                    onChange={(e) => setApiSearchQuery(e.target.value)}
+                    onFocus={() => apiSearchResults.length > 0 && setShowSearchDropdown(true)}
+                    aria-label="Search prompts by API"
+                  />
+                </div>
+                {showSearchDropdown && (apiSearchQuery.trim() || apiSearchResults.length > 0) && (
+                  <div
+                    className="position-absolute start-0 top-100 mt-1 rounded shadow border overflow-hidden z-3 bg-white"
+                    style={{ minWidth: "100%", maxHeight: "260px", overflowY: "auto" }}
+                  >
+                    {apiSearchLoading ? (
+                      <div className="p-3 text-center text-muted small">
+                        <span className="spinner-border spinner-border-sm me-2" /> Searching...
+                      </div>
+                    ) : apiSearchResults.length === 0 ? (
+                      <div className="p-3 text-muted small">
+                        {apiSearchQuery.trim() ? "No prompts found." : "Type to search."}
+                      </div>
+                    ) : (
+                      <ul className="list-group list-group-flush">
+                        {apiSearchResults.map((p) => (
+                          <li key={p.id}>
+                            <button
+                              type="button"
+                              className="list-group-item list-group-item-action d-flex justify-content-between align-items-center w-100 border-0 text-start"
+                              onClick={() => {
+                                setShowSearchDropdown(false);
+                                setApiSearchQuery("");
+                                router.push(`/admin/prompts/edit/${p.id}`);
+                              }}
+                            >
+                              <span className="fw-medium text-truncate me-2">{p.title}</span>
+                              <span className="badge bg-secondary flex-shrink-0">ID {p.id}</span>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Search and Filters Bar */}
           <div className="row mb-4">
             <div className="col-12">
@@ -272,7 +387,7 @@ export default function AdminPromptsPage() {
                         <input
                           type="text"
                           className="form-control border-start-0"
-                          placeholder="Search prompts..."
+                          placeholder="Filter list..."
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
                           style={{ borderRadius: "12px" }}

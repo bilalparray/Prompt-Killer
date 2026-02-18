@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { AuthGuard } from "@/guards/AuthGuard";
 import { useAuth } from "@/hooks/useAuth";
 import { useCommon } from "@/hooks/useCommon";
+import { useRouter } from "next/navigation";
 import { RoleTypeSM } from "@/models/enums/role-type-s-m.enum";
 import { CategoryService } from "@/services/category.service";
 import { CategoryClient } from "@/api/category.client";
@@ -14,19 +15,75 @@ import { CommonResponseCodeHandler } from "@/api/helpers/common-response-code-ha
 import { CategorySM } from "@/models/service/app/v1/category/category-s-m";
 import Link from "next/link";
 
+const SEARCH_DEBOUNCE_MS = 350;
+
 export default function AdminCategoriesPage() {
   const { hasRole } = useAuth();
   const { commonService } = useCommon();
+  const router = useRouter();
   const [categories, setCategories] = useState<CategorySM[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(12);
   const [totalCount, setTotalCount] = useState(0);
+  const [apiSearchQuery, setApiSearchQuery] = useState("");
+  const [apiSearchResults, setApiSearchResults] = useState<CategorySM[]>([]);
+  const [apiSearchLoading, setApiSearchLoading] = useState(false);
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const searchDropdownRef = useRef<HTMLDivElement>(null);
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     loadCategories();
   }, [currentPage]);
+
+  const runApiSearch = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setApiSearchResults([]);
+      return;
+    }
+    setApiSearchLoading(true);
+    try {
+      const storageService = new StorageService();
+      const storageCache = new StorageCache(storageService);
+      const commonResponseCodeHandler = new CommonResponseCodeHandler(storageService);
+      const categoryClient = new CategoryClient(storageService, storageCache, commonResponseCodeHandler);
+      const categoryService = new CategoryService(categoryClient);
+      const resp = await categoryService.searchCategoriesForAdmin(query);
+      setApiSearchResults(resp.successData ?? []);
+      setShowSearchDropdown(true);
+    } catch {
+      setApiSearchResults([]);
+    } finally {
+      setApiSearchLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    if (!apiSearchQuery.trim()) {
+      setApiSearchResults([]);
+      setShowSearchDropdown(false);
+      return;
+    }
+    searchDebounceRef.current = setTimeout(() => {
+      runApiSearch(apiSearchQuery);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => {
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    };
+  }, [apiSearchQuery, runApiSearch]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchDropdownRef.current && !searchDropdownRef.current.contains(e.target as Node)) {
+        setShowSearchDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const loadCategories = async () => {
     try {
@@ -189,6 +246,64 @@ export default function AdminCategoriesPage() {
             </div>
           </div>
 
+          {/* Quick jump: API search */}
+          <div className="row mb-3">
+            <div className="col-12">
+              <div className="position-relative d-inline-block" ref={searchDropdownRef} style={{ minWidth: "280px" }}>
+                <label className="form-label small text-muted mb-1">Quick find category (by name)</label>
+                <div className="input-group">
+                  <span className="input-group-text bg-white">
+                    <i className="bi bi-search text-muted" />
+                  </span>
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="e.g. how to deal..."
+                    value={apiSearchQuery}
+                    onChange={(e) => setApiSearchQuery(e.target.value)}
+                    onFocus={() => apiSearchResults.length > 0 && setShowSearchDropdown(true)}
+                    aria-label="Search categories by API"
+                  />
+                </div>
+                {showSearchDropdown && (apiSearchQuery.trim() || apiSearchResults.length > 0) && (
+                  <div
+                    className="position-absolute start-0 top-100 mt-1 rounded shadow border overflow-hidden z-3 bg-white"
+                    style={{ minWidth: "100%", maxHeight: "260px", overflowY: "auto" }}
+                  >
+                    {apiSearchLoading ? (
+                      <div className="p-3 text-center text-muted small">
+                        <span className="spinner-border spinner-border-sm me-2" /> Searching...
+                      </div>
+                    ) : apiSearchResults.length === 0 ? (
+                      <div className="p-3 text-muted small">
+                        {apiSearchQuery.trim() ? "No categories found." : "Type to search."}
+                      </div>
+                    ) : (
+                      <ul className="list-group list-group-flush">
+                        {apiSearchResults.map((cat) => (
+                          <li key={cat.id}>
+                            <button
+                              type="button"
+                              className="list-group-item list-group-item-action d-flex justify-content-between align-items-center w-100 border-0 text-start"
+                              onClick={() => {
+                                setShowSearchDropdown(false);
+                                setApiSearchQuery("");
+                                router.push(`/admin/categories/${cat.id}/prompts`);
+                              }}
+                            >
+                              <span className="fw-medium">{(cat as { name?: string; title?: string }).name ?? (cat as { name?: string; title?: string }).title ?? "Category"}</span>
+                              <span className="badge bg-secondary">ID {cat.id}</span>
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+
           {/* Search and Actions Bar */}
           <div className="row mb-4">
             <div className="col-12">
@@ -206,7 +321,7 @@ export default function AdminCategoriesPage() {
                         <input
                           type="text"
                           className="form-control border-start-0"
-                          placeholder="Search categories by name, slug, or description..."
+                          placeholder="Filter list by name, slug, or description..."
                           value={searchTerm}
                           onChange={(e) => setSearchTerm(e.target.value)}
                           style={{ borderRadius: "12px" }}

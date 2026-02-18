@@ -61,6 +61,22 @@ export class CategoryService extends BaseService {
     return resp;
   }
 
+  async searchCategoriesForUser(searchString: string): Promise<ApiResponse<CategorySM[]>> {
+    const resp = await this.categoryClient.SearchCategoriesForUser(searchString);
+    if (resp.isError) {
+      throw new Error(resp.errorData?.displayMessage || AppConstants.ERROR_PROMPTS.Load_Data_Error);
+    }
+    return resp;
+  }
+
+  async searchCategoriesForAdmin(searchString: string): Promise<ApiResponse<CategorySM[]>> {
+    const resp = await this.categoryClient.SearchCategoriesForAdmin(searchString);
+    if (resp.isError) {
+      throw new Error(resp.errorData?.displayMessage || AppConstants.ERROR_PROMPTS.Load_Data_Error);
+    }
+    return resp;
+  }
+
   async createCategory(category: CategorySM): Promise<ApiResponse<BoolResponseRoot>> {
     if (!category || !category.name) {
       throw new Error(AppConstants.ERROR_PROMPTS.Invalid_Input_Data);

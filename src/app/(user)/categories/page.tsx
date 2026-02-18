@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { UserLayout } from "@/components/layout/UserLayout";
 import { CategoryService } from "@/services/category.service";
 import { CategoryClient } from "@/api/category.client";
@@ -12,6 +12,8 @@ import Link from "next/link";
 import { useCommon } from "@/hooks/useCommon";
 import { CategoryCard } from "@/components/user/CategoryCard";
 
+const SEARCH_DEBOUNCE_MS = 350;
+
 export default function CategoriesPage() {
   const { commonService } = useCommon();
   const [categories, setCategories] = useState<CategorySM[]>([]);
@@ -19,11 +21,63 @@ export default function CategoriesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage] = useState(12);
   const [totalCount, setTotalCount] = useState(0);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [apiSearchQuery, setApiSearchQuery] = useState("");
+  const [apiSearchResults, setApiSearchResults] = useState<CategorySM[]>([]);
+  const [apiSearchLoading, setApiSearchLoading] = useState(false);
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false);
+  const searchDropdownRef = useRef<HTMLDivElement>(null);
+  const searchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     loadCategories();
   }, [currentPage]);
+
+  const runApiSearch = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setApiSearchResults([]);
+      return;
+    }
+    setApiSearchLoading(true);
+    try {
+      const storageService = new StorageService();
+      const storageCache = new StorageCache(storageService);
+      const commonResponseCodeHandler = new CommonResponseCodeHandler(storageService);
+      const categoryClient = new CategoryClient(storageService, storageCache, commonResponseCodeHandler);
+      const categoryService = new CategoryService(categoryClient);
+      const resp = await categoryService.searchCategoriesForUser(query);
+      setApiSearchResults(resp.successData ?? []);
+      setShowSearchDropdown(true);
+    } catch {
+      setApiSearchResults([]);
+    } finally {
+      setApiSearchLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    if (!apiSearchQuery.trim()) {
+      setApiSearchResults([]);
+      setShowSearchDropdown(false);
+      return;
+    }
+    searchDebounceRef.current = setTimeout(() => {
+      runApiSearch(apiSearchQuery);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => {
+      if (searchDebounceRef.current) clearTimeout(searchDebounceRef.current);
+    };
+  }, [apiSearchQuery, runApiSearch]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (searchDropdownRef.current && !searchDropdownRef.current.contains(e.target as Node)) {
+        setShowSearchDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   const loadCategories = async () => {
     try {
@@ -58,12 +112,6 @@ export default function CategoriesPage() {
     }
   };
 
-  const filteredCategories = categories.filter(
-    (cat) =>
-      cat.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      cat.description?.toLowerCase().includes(searchTerm.toLowerCase())
-  );
-
   const totalPages = Math.ceil(totalCount / itemsPerPage);
   const startItem = totalCount > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0;
   const endItem = Math.min(currentPage * itemsPerPage, totalCount);
@@ -88,20 +136,63 @@ export default function CategoriesPage() {
           <h1 className="h2 fw-bold text-white mb-2">Library</h1>
           <p className="text-white-50 mb-4 small">Browse prompts by category.</p>
           <div className="row justify-content-center">
-            <div className="col-md-6 col-lg-5">
-              <div className="input-group">
+            <div className="col-md-8 col-lg-6 position-relative" ref={searchDropdownRef}>
+              <div className="input-group input-group-lg">
                 <span className="input-group-text bg-dark border-secondary text-white">
                   <i className="bi bi-search" />
                 </span>
                 <input
                   type="text"
                   className="form-control bg-dark border-secondary text-white"
-                  placeholder="Search categories..."
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+                  placeholder="Search categories by name (e.g. how to deal)..."
+                  value={apiSearchQuery}
+                  onChange={(e) => setApiSearchQuery(e.target.value)}
+                  onFocus={() => apiSearchResults.length > 0 && setShowSearchDropdown(true)}
                   aria-label="Search categories"
+                  aria-autocomplete="list"
+                  aria-expanded={showSearchDropdown}
                 />
               </div>
+              {showSearchDropdown && (apiSearchQuery.trim() || apiSearchResults.length > 0) && (
+                <div
+                  className="position-absolute start-0 end-0 mx-auto mt-1 rounded shadow-lg border-0 overflow-hidden z-3"
+                  style={{
+                    maxWidth: "100%",
+                    width: "inherit",
+                    maxHeight: "280px",
+                    overflowY: "auto",
+                    background: "var(--bs-body-bg)",
+                  }}
+                >
+                  {apiSearchLoading ? (
+                    <div className="p-3 text-center text-muted small">
+                      <span className="spinner-border spinner-border-sm me-2" /> Searching...
+                    </div>
+                  ) : apiSearchResults.length === 0 ? (
+                    <div className="p-3 text-muted small">
+                      {apiSearchQuery.trim() ? "No categories found." : "Type to search."}
+                    </div>
+                  ) : (
+                    <ul className="list-group list-group-flush">
+                      {apiSearchResults.map((cat) => (
+                        <li key={cat.id}>
+                          <Link
+                            href={`/categories/${cat.id}`}
+                            className="list-group-item list-group-item-action d-flex justify-content-between align-items-center text-decoration-none"
+                            onClick={() => {
+                              setShowSearchDropdown(false);
+                              setApiSearchQuery("");
+                            }}
+                          >
+                            <span className="fw-medium">{(cat as { name?: string; title?: string }).name ?? (cat as { name?: string; title?: string }).title ?? "Category"}</span>
+                            <span className="badge bg-secondary">ID {cat.id}</span>
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
@@ -114,10 +205,10 @@ export default function CategoriesPage() {
               <div className="spinner-border text-primary" role="status" style={{ width: "2.5rem", height: "2.5rem" }} />
               <p className="mt-3 text-muted small">Loading categories...</p>
             </div>
-          ) : filteredCategories.length > 0 ? (
+          ) : categories.length > 0 ? (
             <>
               <div className="row g-3 g-md-4 mb-4">
-                {filteredCategories.map((category) => (
+                {categories.map((category) => (
                   <div key={category.id} className="col-md-6 col-lg-4 col-xl-3">
                     <CategoryCard category={category} />
                   </div>
@@ -165,9 +256,7 @@ export default function CategoriesPage() {
           ) : (
             <div className="text-center py-5">
               <i className="bi bi-inbox text-muted" style={{ fontSize: "3rem" }} />
-              <p className="mt-3 text-muted mb-0">
-                {searchTerm ? "No categories match your search." : "No categories available."}
-              </p>
+              <p className="mt-3 text-muted mb-0">No categories available.</p>
             </div>
           )}
         </div>

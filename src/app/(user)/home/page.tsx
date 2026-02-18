@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import Link from "next/link";
 import { UserLayout } from "@/components/layout/UserLayout";
 import { PromptImageService } from "@/services/prompt-image.service";
@@ -19,11 +19,19 @@ import { CategoryCard } from "@/components/user/CategoryCard";
 import { PromptCard } from "@/components/user/PromptCard";
 import { TrendingImageCard } from "@/components/user/TrendingImageCard";
 
+const SEARCH_DEBOUNCE_MS = 350;
+
 export default function HomePage() {
   const [trendingImages, setTrendingImages] = useState<PromptImageSM[]>([]);
   const [trendingPrompts, setTrendingPrompts] = useState<PromptSM[]>([]);
   const [categories, setCategories] = useState<CategorySM[]>([]);
   const [loading, setLoading] = useState(true);
+  const [promptSearchQuery, setPromptSearchQuery] = useState("");
+  const [promptSearchResults, setPromptSearchResults] = useState<PromptSM[]>([]);
+  const [promptSearchLoading, setPromptSearchLoading] = useState(false);
+  const [showPromptSearchDropdown, setShowPromptSearchDropdown] = useState(false);
+  const promptSearchRef = useRef<HTMLDivElement>(null);
+  const promptSearchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     const load = async () => {
@@ -63,6 +71,53 @@ export default function HomePage() {
     load();
   }, []);
 
+  const runPromptSearch = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setPromptSearchResults([]);
+      return;
+    }
+    setPromptSearchLoading(true);
+    try {
+      const storageService = new StorageService();
+      const storageCache = new StorageCache(storageService);
+      const commonResponseCodeHandler = new CommonResponseCodeHandler(storageService);
+      const promptClient = new PromptClient(storageService, storageCache, commonResponseCodeHandler);
+      const promptService = new PromptService(promptClient);
+      const resp = await promptService.searchPromptsForUser(query);
+      setPromptSearchResults(resp.successData ?? []);
+      setShowPromptSearchDropdown(true);
+    } catch {
+      setPromptSearchResults([]);
+    } finally {
+      setPromptSearchLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (promptSearchDebounceRef.current) clearTimeout(promptSearchDebounceRef.current);
+    if (!promptSearchQuery.trim()) {
+      setPromptSearchResults([]);
+      setShowPromptSearchDropdown(false);
+      return;
+    }
+    promptSearchDebounceRef.current = setTimeout(() => {
+      runPromptSearch(promptSearchQuery);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => {
+      if (promptSearchDebounceRef.current) clearTimeout(promptSearchDebounceRef.current);
+    };
+  }, [promptSearchQuery, runPromptSearch]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (promptSearchRef.current && !promptSearchRef.current.contains(e.target as Node)) {
+        setShowPromptSearchDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <UserLayout>
       {/* Library hero */}
@@ -89,6 +144,68 @@ export default function HomePage() {
       </section>
 
       <div className="library-page-bg">
+        {/* Search prompts */}
+        <section className="py-5">
+          <div className="container">
+            <h2 className="library-section-title d-flex align-items-center">
+              <i className="bi bi-search me-2 text-primary" />
+              Search prompts
+            </h2>
+            <div className="row justify-content-center">
+              <div className="col-md-8 col-lg-6 position-relative" ref={promptSearchRef}>
+                <div className="input-group input-group-lg">
+                  <span className="input-group-text bg-white border-secondary">
+                    <i className="bi bi-search text-muted" />
+                  </span>
+                  <input
+                    type="text"
+                    className="form-control border-secondary"
+                    placeholder="e.g. how to generate image..."
+                    value={promptSearchQuery}
+                    onChange={(e) => setPromptSearchQuery(e.target.value)}
+                    onFocus={() => promptSearchResults.length > 0 && setShowPromptSearchDropdown(true)}
+                    aria-label="Search prompts"
+                  />
+                </div>
+                {showPromptSearchDropdown && (promptSearchQuery.trim() || promptSearchResults.length > 0) && (
+                  <div
+                    className="position-absolute start-0 end-0 mt-1 rounded shadow-lg border-0 overflow-hidden z-3 bg-white"
+                    style={{ maxWidth: "100%", width: "inherit", maxHeight: "280px", overflowY: "auto" }}
+                  >
+                    {promptSearchLoading ? (
+                      <div className="p-3 text-center text-muted small">
+                        <span className="spinner-border spinner-border-sm me-2" /> Searching...
+                      </div>
+                    ) : promptSearchResults.length === 0 ? (
+                      <div className="p-3 text-muted small">
+                        {promptSearchQuery.trim() ? "No prompts found." : "Type to search."}
+                      </div>
+                    ) : (
+                      <ul className="list-group list-group-flush">
+                        {promptSearchResults.map((p) => (
+                          <li key={p.id}>
+                            <Link
+                              href={`/prompts/${p.id}`}
+                              className="list-group-item list-group-item-action d-flex justify-content-between align-items-center text-decoration-none"
+                              onClick={() => {
+                                setShowPromptSearchDropdown(false);
+                                setPromptSearchQuery("");
+                              }}
+                            >
+                              <span className="fw-medium text-truncate me-2">{p.title}</span>
+                              <span className="badge bg-secondary flex-shrink-0">ID {p.id}</span>
+                            </Link>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+
         {/* Browse by category */}
         <section className="py-5">
           <div className="container">

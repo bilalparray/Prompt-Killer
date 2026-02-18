@@ -93,6 +93,34 @@ export class CategoryClient extends BaseApiClient {
     return resp;
   };
 
+  // Search categories (public - for user)
+  SearchCategoriesForUser = async (searchString: string): Promise<ApiResponse<CategorySM[]>> => {
+    if (!searchString?.trim()) {
+      return { isError: false, successData: [] };
+    }
+    const resp = await this.GetResponseAsync<null, CategorySM[]>(
+      `${AppConstants.API_ENDPOINTS.CATEGORY}/search?searchString=${encodeURIComponent(searchString.trim())}`,
+      "GET",
+      null,
+      new AdditionalRequestDetails<CategorySM[]>(false, Authentication.false)
+    );
+    return resp;
+  };
+
+  // Search categories (admin - with auth)
+  SearchCategoriesForAdmin = async (searchString: string): Promise<ApiResponse<CategorySM[]>> => {
+    if (!searchString?.trim()) {
+      return { isError: false, successData: [] };
+    }
+    const resp = await this.GetResponseAsync<null, CategorySM[]>(
+      `${AppConstants.API_ENDPOINTS.CATEGORY}/search?searchString=${encodeURIComponent(searchString.trim())}`,
+      "GET",
+      null,
+      new AdditionalRequestDetails<CategorySM[]>(false, Authentication.true)
+    );
+    return resp;
+  };
+
   // Create category
   CreateCategory = async (
     category: ApiRequest<CategorySM>
