@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { AdminLayout } from "@/components/layout/AdminLayout";
 import { AuthGuard } from "@/guards/AuthGuard";
@@ -19,6 +19,8 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import Link from "next/link";
+
+const SEARCH_DEBOUNCE_MS = 350;
 
 const promptImageSchema = z
   .object({
@@ -47,9 +49,14 @@ type PromptImageFormData = z.infer<typeof promptImageSchema>;
 export default function CreatePromptImagePage() {
   const router = useRouter();
   const { commonService } = useCommon();
-  const [prompts, setPrompts] = useState<PromptSM[]>([]);
   const [imagePreview, setImagePreview] = useState<string | null>(null);
-  const [loadingPrompts, setLoadingPrompts] = useState(true);
+  const [promptSearchQuery, setPromptSearchQuery] = useState("");
+  const [promptSearchResults, setPromptSearchResults] = useState<PromptSM[]>([]);
+  const [promptSearchLoading, setPromptSearchLoading] = useState(false);
+  const [showPromptSearchDropdown, setShowPromptSearchDropdown] = useState(false);
+  const [selectedPrompt, setSelectedPrompt] = useState<PromptSM | null>(null);
+  const promptSearchRef = useRef<HTMLDivElement>(null);
+  const promptSearchDebounceRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const {
     register,
@@ -66,35 +73,61 @@ export default function CreatePromptImagePage() {
 
   const imageType = watch("imageType");
 
-  useEffect(() => {
-    if (imageType === "prompt") {
-      loadPrompts();
+  const runPromptSearch = useCallback(async (query: string) => {
+    if (!query.trim()) {
+      setPromptSearchResults([]);
+      return;
     }
-  }, [imageType]);
-
-  const loadPrompts = async () => {
+    setPromptSearchLoading(true);
     try {
-      setLoadingPrompts(true);
       const storageService = new StorageService();
       const storageCache = new StorageCache(storageService);
       const commonResponseCodeHandler = new CommonResponseCodeHandler(storageService);
       const promptClient = new PromptClient(storageService, storageCache, commonResponseCodeHandler);
       const promptService = new PromptService(promptClient);
-
-      const response = await promptService.getPrompts(0, 1000);
-      if (response.successData) {
-        setPrompts(response.successData.filter((p) => p.isActive));
-      }
-    } catch (error: any) {
-      await commonService.showSweetAlertToast({
-        icon: "error",
-        title: "Error",
-        text: error.message || "Failed to load prompts",
-      });
+      const resp = await promptService.searchPromptsForAdmin(query);
+      setPromptSearchResults(resp.successData ?? []);
+      setShowPromptSearchDropdown(true);
+    } catch {
+      setPromptSearchResults([]);
     } finally {
-      setLoadingPrompts(false);
+      setPromptSearchLoading(false);
     }
-  };
+  }, []);
+
+  useEffect(() => {
+    if (promptSearchDebounceRef.current) clearTimeout(promptSearchDebounceRef.current);
+    if (!promptSearchQuery.trim()) {
+      setPromptSearchResults([]);
+      setShowPromptSearchDropdown(false);
+      return;
+    }
+    promptSearchDebounceRef.current = setTimeout(() => {
+      runPromptSearch(promptSearchQuery);
+    }, SEARCH_DEBOUNCE_MS);
+    return () => {
+      if (promptSearchDebounceRef.current) clearTimeout(promptSearchDebounceRef.current);
+    };
+  }, [promptSearchQuery, runPromptSearch]);
+
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (promptSearchRef.current && !promptSearchRef.current.contains(e.target as Node)) {
+        setShowPromptSearchDropdown(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  useEffect(() => {
+    if (imageType !== "prompt") {
+      setSelectedPrompt(null);
+      setValue("promptId", undefined);
+      setPromptSearchQuery("");
+      setPromptSearchResults([]);
+    }
+  }, [imageType, setValue]);
 
   const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -257,33 +290,87 @@ export default function CreatePromptImagePage() {
                         </div>
                       </div>
 
-                      {/* Prompt Selection */}
+                      {/* Prompt Selection (search API) */}
                       {imageType === "prompt" && (
                         <div className="col-12">
-                          <label htmlFor="promptId" className="form-label fw-semibold">
+                          <label className="form-label fw-semibold">
                             Select Prompt <span className="text-danger">*</span>
                           </label>
-                          {loadingPrompts ? (
-                            <div className="spinner-border spinner-border-sm" role="status">
-                              <span className="visually-hidden">Loading...</span>
+                          <p className="small text-muted mb-2">Search for a prompt to attach this image to (e.g. how to generate image).</p>
+                          {selectedPrompt ? (
+                            <div className="d-flex align-items-center gap-2 p-3 rounded border bg-light">
+                              <span className="fw-medium flex-grow-1">{selectedPrompt.title}</span>
+                              <span className="badge bg-secondary">ID {selectedPrompt.id}</span>
+                              <button
+                                type="button"
+                                className="btn btn-sm btn-outline-danger"
+                                onClick={() => {
+                                  setSelectedPrompt(null);
+                                  setValue("promptId", undefined);
+                                  setPromptSearchQuery("");
+                                }}
+                              >
+                                Clear
+                              </button>
                             </div>
                           ) : (
-                            <select
-                              className={`form-select form-select-lg ${errors.promptId ? "is-invalid" : ""}`}
-                              id="promptId"
-                              {...register("promptId", { valueAsNumber: true })}
-                              style={{ borderRadius: "12px", border: "2px solid #e9ecef" }}
-                            >
-                              <option value="">Select a prompt</option>
-                              {prompts.map((prompt) => (
-                                <option key={prompt.id} value={prompt.id}>
-                                  {prompt.title}
-                                </option>
-                              ))}
-                            </select>
+                            <div className="position-relative" ref={promptSearchRef}>
+                              <div className="input-group input-group-lg">
+                                <span className="input-group-text bg-white">
+                                  <i className="bi bi-search text-muted" />
+                                </span>
+                                <input
+                                  type="text"
+                                  className={`form-control ${errors.promptId ? "is-invalid" : ""}`}
+                                  placeholder="Search prompts (e.g. how to generate image)..."
+                                  value={promptSearchQuery}
+                                  onChange={(e) => setPromptSearchQuery(e.target.value)}
+                                  onFocus={() => promptSearchResults.length > 0 && setShowPromptSearchDropdown(true)}
+                                  style={{ borderRadius: "12px", border: "2px solid #e9ecef" }}
+                                  aria-label="Search prompts"
+                                />
+                              </div>
+                              {showPromptSearchDropdown && (promptSearchQuery.trim() || promptSearchResults.length > 0) && (
+                                <div
+                                  className="position-absolute start-0 end-0 top-100 mt-1 rounded shadow border overflow-hidden z-3 bg-white"
+                                  style={{ maxHeight: "260px", overflowY: "auto" }}
+                                >
+                                  {promptSearchLoading ? (
+                                    <div className="p-3 text-center text-muted small">
+                                      <span className="spinner-border spinner-border-sm me-2" /> Searching...
+                                    </div>
+                                  ) : promptSearchResults.length === 0 ? (
+                                    <div className="p-3 text-muted small">
+                                      {promptSearchQuery.trim() ? "No prompts found." : "Type to search."}
+                                    </div>
+                                  ) : (
+                                    <ul className="list-group list-group-flush">
+                                      {promptSearchResults.map((p) => (
+                                        <li key={p.id}>
+                                          <button
+                                            type="button"
+                                            className="list-group-item list-group-item-action d-flex justify-content-between align-items-center w-100 border-0 text-start"
+                                            onClick={() => {
+                                              setSelectedPrompt(p);
+                                              setValue("promptId", p.id);
+                                              setShowPromptSearchDropdown(false);
+                                              setPromptSearchQuery("");
+                                              setPromptSearchResults([]);
+                                            }}
+                                          >
+                                            <span className="fw-medium text-truncate me-2">{p.title}</span>
+                                            <span className="badge bg-secondary flex-shrink-0">ID {p.id}</span>
+                                          </button>
+                                        </li>
+                                      ))}
+                                    </ul>
+                                  )}
+                                </div>
+                              )}
+                            </div>
                           )}
                           {errors.promptId && (
-                            <div className="invalid-feedback">{errors.promptId.message}</div>
+                            <div className="invalid-feedback d-block">{errors.promptId.message}</div>
                           )}
                         </div>
                       )}
