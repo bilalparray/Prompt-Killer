@@ -14,6 +14,7 @@ import { PromptSM } from "@/models/service/app/v1/prompt/prompt-s-m";
 import { PromptImageSM } from "@/models/service/app/v1/prompt/prompt-image-s-m";
 import { PromptCard } from "@/components/user/PromptCard";
 import { TrendingImageCard } from "@/components/user/TrendingImageCard";
+import { EmptyState } from "@/components/common/EmptyState";
 
 export default function TrendingPage() {
   const [trendingPrompts, setTrendingPrompts] = useState<PromptSM[]>([]);
@@ -70,7 +71,7 @@ export default function TrendingPage() {
         </div>
       </section>
 
-      <section className="py-5 library-page-bg" style={{ minHeight: "50vh" }}>
+      <section className="py-5 library-page-bg" style={{ minHeight: "50vh" }} aria-busy={loading}>
         <div className="container">
           <ul className="nav nav-pills gap-2 mb-4">
             <li className="nav-item">
@@ -104,9 +105,9 @@ export default function TrendingPage() {
           </ul>
 
           {loading ? (
-            <div className="text-center py-5">
-              <div className="spinner-border text-primary" role="status" style={{ width: "2.5rem", height: "2.5rem" }} />
-              <p className="mt-3 text-muted small">Loading...</p>
+            <div className="text-center py-5" role="status" aria-live="polite">
+              <div className="spinner-border text-primary" style={{ width: "2.5rem", height: "2.5rem" }} aria-hidden />
+              <p className="mt-3 text-muted small">Loading trending…</p>
             </div>
           ) : activeTab === "images" ? (
             trendingImages.length > 0 ? (
@@ -118,11 +119,13 @@ export default function TrendingPage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-5">
-                <i className="bi bi-image text-muted" style={{ fontSize: "3rem" }} />
-                <p className="mt-3 text-muted mb-0">No trending images yet.</p>
-                <Link href="/categories" className="btn library-btn-primary btn-sm mt-3">Browse library</Link>
-              </div>
+              <EmptyState
+                icon="bi-image"
+                title="No trending images yet"
+                description="Featured images will appear here."
+                primaryAction={{ label: "Browse library", href: "/categories" }}
+                secondaryAction={{ label: "Go to Home", href: "/home" }}
+              />
             )
           ) : trendingPrompts.length > 0 ? (
             <div className="row g-3 g-md-4">
@@ -133,11 +136,13 @@ export default function TrendingPage() {
               ))}
             </div>
           ) : (
-            <div className="text-center py-5">
-              <i className="bi bi-lightning-charge text-muted" style={{ fontSize: "3rem" }} />
-              <p className="mt-3 text-muted mb-0">No trending prompts yet.</p>
-              <Link href="/categories" className="btn library-btn-primary btn-sm mt-3">Browse library</Link>
-            </div>
+            <EmptyState
+              icon="bi-lightning-charge"
+              title="No trending prompts yet"
+              description="Trending prompts will show here when they’re added."
+              primaryAction={{ label: "Browse library", href: "/categories" }}
+              secondaryAction={{ label: "Go to Home", href: "/home" }}
+            />
           )}
         </div>
       </section>

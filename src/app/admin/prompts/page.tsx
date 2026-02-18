@@ -328,24 +328,35 @@ export default function AdminPromptsPage() {
                     value={apiSearchQuery}
                     onChange={(e) => setApiSearchQuery(e.target.value)}
                     onFocus={() => apiSearchResults.length > 0 && setShowSearchDropdown(true)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape") {
+                        setShowSearchDropdown(false);
+                        (e.target as HTMLInputElement).blur();
+                      }
+                    }}
                     aria-label="Search prompts by API"
+                    aria-expanded={showSearchDropdown}
+                    aria-controls="admin-prompt-search-results"
                   />
                 </div>
                 {showSearchDropdown && (apiSearchQuery.trim() || apiSearchResults.length > 0) && (
                   <div
+                    id="admin-prompt-search-results"
+                    role="listbox"
                     className="position-absolute start-0 top-100 mt-1 rounded shadow border overflow-hidden z-3 bg-white"
                     style={{ minWidth: "100%", maxHeight: "260px", overflowY: "auto" }}
+                    aria-label="Search results"
                   >
                     {apiSearchLoading ? (
-                      <div className="p-3 text-center text-muted small">
-                        <span className="spinner-border spinner-border-sm me-2" /> Searching...
+                      <div className="p-3 text-center text-muted small" role="status" aria-live="polite">
+                        <span className="spinner-border spinner-border-sm me-2" aria-hidden /> Searching...
                       </div>
                     ) : apiSearchResults.length === 0 ? (
-                      <div className="p-3 text-muted small">
+                      <div className="p-3 text-muted small" role="status" aria-live="polite">
                         {apiSearchQuery.trim() ? "No prompts found." : "Type to search."}
                       </div>
                     ) : (
-                      <ul className="list-group list-group-flush">
+                      <ul className="list-group list-group-flush" role="group" aria-label={`${apiSearchResults.length} prompt${apiSearchResults.length === 1 ? "" : "s"} found`}>
                         {apiSearchResults.map((p) => (
                           <li key={p.id}>
                             <button
@@ -432,11 +443,10 @@ export default function AdminPromptsPage() {
           </div>
 
           {/* Prompts Grid */}
+          <div aria-busy={loading}>
           {loading ? (
-            <div className="text-center py-5">
-              <div className="spinner-border text-primary" role="status" style={{ width: "3rem", height: "3rem" }}>
-                <span className="visually-hidden">Loading...</span>
-              </div>
+            <div className="text-center py-5" role="status" aria-live="polite">
+              <div className="spinner-border text-primary" style={{ width: "3rem", height: "3rem" }} aria-hidden />
               <p className="mt-3 text-muted">Loading prompts...</p>
             </div>
           ) : filteredPrompts.length > 0 ? (
@@ -632,13 +642,13 @@ export default function AdminPromptsPage() {
               )}
             </>
           ) : (
-            <div className="col-12">
+            <div className="col-12" role="region" aria-label="No results">
               <div
                 className="card border-0 shadow-sm text-center py-5"
                 style={{ borderRadius: "20px" }}
               >
                 <div className="card-body">
-                  <i className="bi bi-inbox text-muted" style={{ fontSize: "4rem" }}></i>
+                  <i className="bi bi-inbox text-muted" style={{ fontSize: "4rem" }} aria-hidden></i>
                   <h5 className="mt-3 mb-2">No prompts found</h5>
                   <p className="text-muted mb-4">
                     {searchTerm
@@ -664,6 +674,7 @@ export default function AdminPromptsPage() {
               </div>
             </div>
           )}
+          </div>
         </div>
 
         <style jsx global>{`

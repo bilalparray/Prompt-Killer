@@ -11,6 +11,7 @@ import { CategorySM } from "@/models/service/app/v1/category/category-s-m";
 import Link from "next/link";
 import { useCommon } from "@/hooks/useCommon";
 import { CategoryCard } from "@/components/user/CategoryCard";
+import { EmptyState } from "@/components/common/EmptyState";
 
 const SEARCH_DEBOUNCE_MS = 350;
 
@@ -148,13 +149,22 @@ export default function CategoriesPage() {
                   value={apiSearchQuery}
                   onChange={(e) => setApiSearchQuery(e.target.value)}
                   onFocus={() => apiSearchResults.length > 0 && setShowSearchDropdown(true)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Escape") {
+                      setShowSearchDropdown(false);
+                      (e.target as HTMLInputElement).blur();
+                    }
+                  }}
                   aria-label="Search categories"
                   aria-autocomplete="list"
                   aria-expanded={showSearchDropdown}
+                  aria-controls="category-search-results"
                 />
               </div>
               {showSearchDropdown && (apiSearchQuery.trim() || apiSearchResults.length > 0) && (
                 <div
+                  id="category-search-results"
+                  role="listbox"
                   className="position-absolute start-0 end-0 mx-auto mt-1 rounded shadow-lg border-0 overflow-hidden z-3"
                   style={{
                     maxWidth: "100%",
@@ -163,17 +173,18 @@ export default function CategoriesPage() {
                     overflowY: "auto",
                     background: "var(--bs-body-bg)",
                   }}
+                  aria-label="Search results"
                 >
                   {apiSearchLoading ? (
-                    <div className="p-3 text-center text-muted small">
-                      <span className="spinner-border spinner-border-sm me-2" /> Searching...
+                    <div className="p-3 text-center text-muted small" role="status" aria-live="polite">
+                      <span className="spinner-border spinner-border-sm me-2" aria-hidden /> Searching...
                     </div>
                   ) : apiSearchResults.length === 0 ? (
-                    <div className="p-3 text-muted small">
+                    <div className="p-3 text-muted small" role="status" aria-live="polite">
                       {apiSearchQuery.trim() ? "No categories found." : "Type to search."}
                     </div>
                   ) : (
-                    <ul className="list-group list-group-flush">
+                    <ul className="list-group list-group-flush" role="group" aria-label={`${apiSearchResults.length} categor${apiSearchResults.length === 1 ? "y" : "ies"} found`}>
                       {apiSearchResults.map((cat) => (
                         <li key={cat.id}>
                           <Link
@@ -198,11 +209,11 @@ export default function CategoriesPage() {
         </div>
       </section>
 
-      <section className="py-5 library-page-bg" style={{ minHeight: "50vh" }}>
+      <section className="py-5 library-page-bg" style={{ minHeight: "50vh" }} aria-busy={loading}>
         <div className="container">
           {loading ? (
-            <div className="text-center py-5">
-              <div className="spinner-border text-primary" role="status" style={{ width: "2.5rem", height: "2.5rem" }} />
+            <div className="text-center py-5" role="status" aria-live="polite">
+              <div className="spinner-border text-primary" style={{ width: "2.5rem", height: "2.5rem" }} aria-hidden />
               <p className="mt-3 text-muted small">Loading categories...</p>
             </div>
           ) : categories.length > 0 ? (
@@ -254,10 +265,12 @@ export default function CategoriesPage() {
               )}
             </>
           ) : (
-            <div className="text-center py-5">
-              <i className="bi bi-inbox text-muted" style={{ fontSize: "3rem" }} />
-              <p className="mt-3 text-muted mb-0">No categories available.</p>
-            </div>
+            <EmptyState
+              icon="bi-inbox"
+              title="No categories available"
+              description="Categories will appear here once they’re added."
+              primaryAction={{ label: "Go to Home", href: "/home" }}
+            />
           )}
         </div>
       </section>

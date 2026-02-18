@@ -326,25 +326,36 @@ export default function CreatePromptImagePage() {
                                   value={promptSearchQuery}
                                   onChange={(e) => setPromptSearchQuery(e.target.value)}
                                   onFocus={() => promptSearchResults.length > 0 && setShowPromptSearchDropdown(true)}
+                                  onKeyDown={(e) => {
+                                    if (e.key === "Escape") {
+                                      setShowPromptSearchDropdown(false);
+                                      (e.target as HTMLInputElement).blur();
+                                    }
+                                  }}
                                   style={{ borderRadius: "12px", border: "2px solid #e9ecef" }}
                                   aria-label="Search prompts"
+                                  aria-expanded={showPromptSearchDropdown}
+                                  aria-controls="create-prompt-search-results"
                                 />
                               </div>
                               {showPromptSearchDropdown && (promptSearchQuery.trim() || promptSearchResults.length > 0) && (
                                 <div
+                                  id="create-prompt-search-results"
+                                  role="listbox"
                                   className="position-absolute start-0 end-0 top-100 mt-1 rounded shadow border overflow-hidden z-3 bg-white"
                                   style={{ maxHeight: "260px", overflowY: "auto" }}
+                                  aria-label="Search results"
                                 >
                                   {promptSearchLoading ? (
-                                    <div className="p-3 text-center text-muted small">
-                                      <span className="spinner-border spinner-border-sm me-2" /> Searching...
+                                    <div className="p-3 text-center text-muted small" role="status" aria-live="polite">
+                                      <span className="spinner-border spinner-border-sm me-2" aria-hidden /> Searching...
                                     </div>
                                   ) : promptSearchResults.length === 0 ? (
-                                    <div className="p-3 text-muted small">
+                                    <div className="p-3 text-muted small" role="status" aria-live="polite">
                                       {promptSearchQuery.trim() ? "No prompts found." : "Type to search."}
                                     </div>
                                   ) : (
-                                    <ul className="list-group list-group-flush">
+                                    <ul className="list-group list-group-flush" role="group" aria-label={`${promptSearchResults.length} prompt${promptSearchResults.length === 1 ? "" : "s"} found`}>
                                       {promptSearchResults.map((p) => (
                                         <li key={p.id}>
                                           <button

@@ -52,9 +52,46 @@ footer a:hover {
   color: #ffffff !important;
 }
 
-/* Smooth transitions */
-* {
-  transition: background-color 0.3s ease, color 0.3s ease;
+/* Focus visible for keyboard users - do not remove outlines for focus */
+:focus-visible {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* Skip link: off-screen until focused (keyboard a11y) */
+.skip-link {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 10001;
+  padding: 0.75rem 1rem;
+  margin: 0.5rem;
+  background: #2d3748;
+  color: #fff;
+  font-weight: 600;
+  border-radius: 8px;
+  transform: translateY(-120%);
+  transition: transform 0.2s ease;
+}
+.skip-link:focus {
+  transform: translateY(0);
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* Smooth transitions only on interactive elements to avoid layout jank */
+a, button, .btn, .card, .nav-link, .form-control, .form-select {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
 
 /* Spinner overlay - below toast so API messages stay visible */

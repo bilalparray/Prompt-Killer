@@ -12,8 +12,13 @@ interface UserLayoutProps {
 export function UserLayout({ children }: UserLayoutProps) {
   return (
     <div className="d-flex flex-column min-vh-100">
+      <a href="#main-content" className="skip-link">
+        Skip to main content
+      </a>
       <UserTopNav />
-      <main className="flex-grow-1">{children}</main>
+      <main id="main-content" className="flex-grow-1" tabIndex={-1}>
+        {children}
+      </main>
       <Footer />
       <Spinner />
     </div>

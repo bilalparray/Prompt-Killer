@@ -18,6 +18,7 @@ import { PromptSM } from "@/models/service/app/v1/prompt/prompt-s-m";
 import { CategoryCard } from "@/components/user/CategoryCard";
 import { PromptCard } from "@/components/user/PromptCard";
 import { TrendingImageCard } from "@/components/user/TrendingImageCard";
+import { EmptyState } from "@/components/common/EmptyState";
 
 const SEARCH_DEBOUNCE_MS = 350;
 
@@ -164,24 +165,35 @@ export default function HomePage() {
                     value={promptSearchQuery}
                     onChange={(e) => setPromptSearchQuery(e.target.value)}
                     onFocus={() => promptSearchResults.length > 0 && setShowPromptSearchDropdown(true)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Escape") {
+                        setShowPromptSearchDropdown(false);
+                        (e.target as HTMLInputElement).blur();
+                      }
+                    }}
                     aria-label="Search prompts"
+                    aria-expanded={showPromptSearchDropdown}
+                    aria-controls="prompt-search-results"
                   />
                 </div>
                 {showPromptSearchDropdown && (promptSearchQuery.trim() || promptSearchResults.length > 0) && (
                   <div
+                    id="prompt-search-results"
+                    role="listbox"
                     className="position-absolute start-0 end-0 mt-1 rounded shadow-lg border-0 overflow-hidden z-3 bg-white"
                     style={{ maxWidth: "100%", width: "inherit", maxHeight: "280px", overflowY: "auto" }}
+                    aria-label="Search results"
                   >
                     {promptSearchLoading ? (
-                      <div className="p-3 text-center text-muted small">
-                        <span className="spinner-border spinner-border-sm me-2" /> Searching...
+                      <div className="p-3 text-center text-muted small" role="status" aria-live="polite">
+                        <span className="spinner-border spinner-border-sm me-2" aria-hidden /> Searching...
                       </div>
                     ) : promptSearchResults.length === 0 ? (
-                      <div className="p-3 text-muted small">
+                      <div className="p-3 text-muted small" role="status" aria-live="polite">
                         {promptSearchQuery.trim() ? "No prompts found." : "Type to search."}
                       </div>
                     ) : (
-                      <ul className="list-group list-group-flush">
+                      <ul className="list-group list-group-flush" role="group" aria-label={`${promptSearchResults.length} prompt${promptSearchResults.length === 1 ? "" : "s"} found`}>
                         {promptSearchResults.map((p) => (
                           <li key={p.id}>
                             <Link
@@ -207,16 +219,16 @@ export default function HomePage() {
         </section>
 
         {/* Browse by category */}
-        <section className="py-5">
+        <section className="py-5" aria-busy={loading}>
           <div className="container">
             <h2 className="library-section-title d-flex align-items-center">
               <i className="bi bi-grid-3x3-gap me-2 text-primary" />
               Browse by category
             </h2>
             {loading ? (
-              <div className="text-center py-5">
-                <div className="spinner-border text-primary" role="status" style={{ width: "2.5rem", height: "2.5rem" }} />
-                <p className="mt-3 text-muted small">Loading…</p>
+              <div className="text-center py-5" role="status" aria-live="polite">
+                <div className="spinner-border text-primary" style={{ width: "2.5rem", height: "2.5rem" }} aria-hidden />
+                <p className="mt-3 text-muted small">Loading categories…</p>
               </div>
             ) : categories.length > 0 ? (
               <div className="row g-3 g-md-4">
@@ -227,7 +239,13 @@ export default function HomePage() {
                 ))}
               </div>
             ) : (
-              <p className="text-muted mb-0">No categories yet.</p>
+              <EmptyState
+                icon="bi-grid-3x3-gap"
+                title="No categories yet"
+                description="Categories will appear here once they’re added."
+                primaryAction={{ label: "Browse library", href: "/categories" }}
+                iconSize={2.5}
+              />
             )}
             {categories.length > 0 && (
               <div className="mt-4">
@@ -279,7 +297,14 @@ export default function HomePage() {
             )}
 
             {!loading && trendingImages.length === 0 && trendingPrompts.length === 0 && (
-              <p className="text-muted mb-0">No trending content yet. Check back later or browse categories.</p>
+              <EmptyState
+                icon="bi-fire"
+                title="No trending content yet"
+                description="Check back later or browse categories."
+                primaryAction={{ label: "Browse library", href: "/categories" }}
+                secondaryAction={{ label: "Go to Home", href: "/home" }}
+                iconSize={2.5}
+              />
             )}
           </div>
         </section>

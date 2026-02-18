@@ -14,6 +14,7 @@ import { CommonResponseCodeHandler } from "@/api/helpers/common-response-code-ha
 import { CategorySM } from "@/models/service/app/v1/category/category-s-m";
 import { PromptSM } from "@/models/service/app/v1/prompt/prompt-s-m";
 import { PromptCard } from "@/components/user/PromptCard";
+import { EmptyState } from "@/components/common/EmptyState";
 
 function getDisplayDescription(description: string | undefined): string | null {
   const d = description?.trim();
@@ -85,11 +86,11 @@ export default function CategoryPromptsPage() {
         </div>
       </section>
 
-      <section className="py-5 library-page-bg" style={{ minHeight: "50vh" }}>
+      <section className="py-5 library-page-bg" style={{ minHeight: "50vh" }} aria-busy={loading}>
         <div className="container">
           {loading ? (
-            <div className="text-center py-5">
-              <div className="spinner-border text-primary" role="status" style={{ width: "2.5rem", height: "2.5rem" }} />
+            <div className="text-center py-5" role="status" aria-live="polite">
+              <div className="spinner-border text-primary" style={{ width: "2.5rem", height: "2.5rem" }} aria-hidden />
               <p className="mt-3 text-muted small">Loading prompts...</p>
             </div>
           ) : prompts.filter((p) => p.isActive).length > 0 ? (
@@ -136,11 +137,13 @@ export default function CategoryPromptsPage() {
               )}
             </>
           ) : (
-            <div className="text-center py-5">
-              <i className="bi bi-inbox text-muted" style={{ fontSize: "3rem" }} />
-              <p className="mt-3 text-muted mb-0">No prompts in this category.</p>
-              <Link href="/categories" className="btn library-btn-primary btn-sm mt-3">Browse categories</Link>
-            </div>
+            <EmptyState
+              icon="bi-inbox"
+              title="No prompts in this category"
+              description="Prompts will show here when they’re added to this category."
+              primaryAction={{ label: "Browse categories", href: "/categories" }}
+              secondaryAction={{ label: "Go to Home", href: "/home" }}
+            />
           )}
         </div>
       </section>

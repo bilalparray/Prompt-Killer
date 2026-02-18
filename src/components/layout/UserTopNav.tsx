@@ -14,12 +14,25 @@ export function UserTopNav() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+  const navTogglerRef = React.useRef<HTMLButtonElement>(null);
+
   useEffect(() => {
     const handleScroll = () => {
       setScrolled(window.scrollY > 20);
     };
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleEscape = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        setMobileMenuOpen(false);
+        navTogglerRef.current?.focus();
+      }
+    };
+    window.addEventListener("keydown", handleEscape);
+    return () => window.removeEventListener("keydown", handleEscape);
   }, []);
 
   if (!showNav) return null;
@@ -69,10 +82,13 @@ export function UserTopNav() {
           </Link>
 
           <button
+            ref={navTogglerRef}
             className="navbar-toggler border-0"
             type="button"
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle navigation"
+            aria-expanded={mobileMenuOpen}
+            aria-controls="userNavbarNav"
             style={{ padding: "4px 8px" }}
           >
             <span className="navbar-toggler-icon"></span>
