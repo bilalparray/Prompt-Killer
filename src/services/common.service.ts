@@ -8,6 +8,8 @@ export class CommonService extends BaseService {
   layoutViewModel: LayoutViewModel = new LayoutViewModel();
   showNav: boolean = true;
   loaderInfo: LoaderInfo = { message: "", showLoader: false };
+  /** Set by CommonProvider so loader state triggers React re-render; also used to hide loader before showing toast */
+  setLoaderInfo: ((info: LoaderInfo) => void) | null = null;
 
   handleEnterKey(event: any): void {
     if (event.key === "Enter") {
@@ -17,11 +19,14 @@ export class CommonService extends BaseService {
 
   async presentLoading(message: string = "") {
     this.loaderInfo = { message, showLoader: true };
+    this.setLoaderInfo?.(this.loaderInfo);
   }
 
-  async dismissLoader() {
-    this.loaderInfo.showLoader = false;
-    this.loaderInfo.message = "";
+  /** Dismiss loader and resolve after a short delay so the overlay is gone before caller shows toast/msg */
+  async dismissLoader(): Promise<void> {
+    this.loaderInfo = { message: "", showLoader: false };
+    this.setLoaderInfo?.(this.loaderInfo);
+    return new Promise((resolve) => setTimeout(resolve, 120));
   }
 
   /**Show custom sweet alert*/

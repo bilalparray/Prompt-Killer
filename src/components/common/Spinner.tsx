@@ -4,8 +4,8 @@ import React from "react";
 import { useCommon } from "@/hooks/useCommon";
 
 export function Spinner() {
-  const { commonService } = useCommon();
-  const { showLoader, message } = commonService.loaderInfo;
+  const { loaderInfo } = useCommon();
+  const { showLoader, message } = loaderInfo;
 
   if (!showLoader) return null;
 

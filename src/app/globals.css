@@ -57,7 +57,7 @@ footer a:hover {
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Spinner overlay */
+/* Spinner overlay - below toast so API messages stay visible */
 .spinner-overlay {
   position: fixed;
   top: 0;
@@ -68,8 +68,13 @@ footer a:hover {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 9999;
+  z-index: 9998;
   backdrop-filter: blur(4px);
+}
+
+/* SweetAlert toast above loader so success/error messages are visible */
+.swal2-container.swal2-bottom {
+  z-index: 10000 !important;
 }
 
 .spinner-container {
